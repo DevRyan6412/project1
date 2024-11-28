@@ -44,9 +44,8 @@
 </th:block>
 <!-- 사용자 스크립트 추가 -->
 <th:block layout:fragment="script">
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script>
-<!--    <script th:inline="javascript">-->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script th:inline="javascript">
         $(document).ready(function(){
 
             calculateTotalPrice();
