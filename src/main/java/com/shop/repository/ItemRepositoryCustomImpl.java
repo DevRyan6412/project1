@@ -86,9 +86,7 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom{
     public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable) {
 
         QItem item = QItem.item;
-        //QItem commentStar = QItem.commentStar;
         QItemImg itemImg = QItemImg.itemImg;
-
 
         QueryResults<MainItemDto> results = queryFactory
                 .select(new QMainItemDto(
