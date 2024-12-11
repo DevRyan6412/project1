@@ -32,7 +32,7 @@
         <div class="bg-dark py-5">
             <div class="container px-4 px-lg-5 my-5">
                 <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder">Shop in style</h1>
+                    <h1 class="display-4 fw-bolder">Shop in style merge test kim 1:00</h1>
                     <p class="lead fw-normal text-white-50 mb-0">With this shop hompeage template</p>
                 </div>
             </div>
@@ -50,11 +50,10 @@
                                 <div class="card-body p-4">
                                     <h5 class="fw-bolder">[[${item.itemNm}]]</h5>
                                     <div class="d-flex justify-content-center small text-warning mb-2">
-                                        <div class="bi-star-fill"></div>
-                                        <div class="bi-star-fill"></div>
-                                        <div class="bi-star-fill"></div><!--table (star) column 추가 [1,2,3,4,5]-->
-                                        <div class="bi-star-fill"></div>
-                                        <div class="bi-star-fill"></div>
+                                        <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                            <div th:if="${i <= item.averageStar}" class="bi-star-fill"></div>
+                                            <div th:if="${i > item.averageStar}" class="bi-star"></div>
+                                        </span>
                                     </div>
                                     <p class="text-center">[[${item.itemDetail}]]</p>
                                     <p class="text-center">[[${item.price}]]원</p>

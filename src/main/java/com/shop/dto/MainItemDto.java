@@ -18,6 +18,8 @@ public class MainItemDto {
 
     private Integer price;
 
+    private Double averageStar; //평균 별점
+
     @QueryProjection
     public MainItemDto(Long id, String itemNm, String itemDetail, String imgUrl, Integer price){
 
