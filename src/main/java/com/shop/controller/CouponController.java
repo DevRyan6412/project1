@@ -61,15 +61,42 @@ public class CouponController {
 //        }
 //    }
 
+//    @PostMapping("/apply")
+//    public ResponseEntity<?> applyCoupon(@RequestBody CouponApplyRequest request,
+//                                         @SessionAttribute(name = "mileageApplied", required = false) Boolean mileageApplied,
+//                                         HttpSession session) {
+//        try {
+//            if (Boolean.TRUE.equals(mileageApplied)) {
+//                return ResponseEntity.badRequest().body("쿠폰을 먼저 적용해주세요. 현재 마일리지가 이미 적용된 상태입니다.");
+//            }
+//            double discount = couponService.applyCoupon(request.getCouponCode(), request.getOriginalPrice());
+//            CouponApplyResponse response = new CouponApplyResponse(
+//                    request.getOriginalPrice(),
+//                    discount,
+//                    request.getOriginalPrice() - discount
+//            );
+//            session.setAttribute("couponApplied", true);
+//            return ResponseEntity.ok(response);
+//        } catch (IllegalArgumentException e) {
+//
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        }
+//    }
+
     @PostMapping("/apply")
     public ResponseEntity<?> applyCoupon(@RequestBody CouponApplyRequest request,
                                          @SessionAttribute(name = "mileageApplied", required = false) Boolean mileageApplied,
                                          HttpSession session) {
+        if (Boolean.TRUE.equals(mileageApplied)) {
+            return ResponseEntity.badRequest().body("쿠폰을 먼저 적용해주세요. 현재 마일리지가 이미 적용된 상태입니다.");
+        }
         try {
-            if (Boolean.TRUE.equals(mileageApplied)) {
-                return ResponseEntity.badRequest().body("쿠폰을 먼저 적용해주세요. 현재 마일리지가 이미 적용된 상태입니다.");
-            }
+            // 유효하지 않은 쿠폰 코드인 경우 예외 처리
             double discount = couponService.applyCoupon(request.getCouponCode(), request.getOriginalPrice());
+            if (discount <= 0) {
+                return ResponseEntity.ok("없는 쿠폰입니다. 다시 시도해주세요."); // 유효하지 않은 쿠폰 메시지 반환
+            }
+
             CouponApplyResponse response = new CouponApplyResponse(
                     request.getOriginalPrice(),
                     discount,
@@ -78,7 +105,7 @@ public class CouponController {
             session.setAttribute("couponApplied", true);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.ok("없는 쿠폰입니다. 다시 시도해주세요."); // 예외 발생 시 사용자 친화적 메시지 반환
         }
     }
 

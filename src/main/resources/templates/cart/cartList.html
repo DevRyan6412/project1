@@ -22,48 +22,132 @@
             });
         }
 
+        function setupAjax() {
+            const token = $("meta[name='_csrf']").attr("content");
+            const header = $("meta[name='_csrf_header']").attr("content");
+            return { token, header };
+        }
+
         // 쿠폰 적용
+//         function applyCoupon() {
+//             const cartItems = collectCartItems();
+//             const couponCode = $("#couponCode").val().trim();  // 쿠폰 코드 입력 값
+//             if (!cartItems || cartItems.length === 0) {
+//                 alert("장바구니에 상품이 없습니다.");
+//                 return;
+//             }
+//             if (!couponCode) {
+//                 alert("쿠폰 코드를 입력해주세요.");
+//                 return;
+//             }
+//             let totalPrice = getOrderTotalPrice();  // 전체 주문 금액을 가져옵니다.
+//             if (totalPrice <= 0) {
+//                 alert("적용할 상품을 선택해주세요.");
+//                 return;
+//             }
+//             // 마일리지 적용 여부 확인
+//             const mileageApplied = sessionStorage.getItem("mileageApplied") === "true";
+//             if (mileageApplied) {
+//                 alert("마일리지를 먼저 사용한 경우 쿠폰을 적용할 수 없습니다. 쿠폰을 먼저 사용해주세요.");
+//                 // 마일리지 초기화 (메시지 표시 없이 처리)
+//                 resetMileage(false); // `false`로 메시지 비활성화
+//                 // 쿠폰 초기화
+//                 $("#couponCode").val("").prop("disabled", false);
+//                 $("#applyCouponButton").text("쿠폰 적용");
+//                 $("#applyCouponButton").attr("onclick", "applyCoupon()");
+//                 $("#discount").val(0);
+//                 // 상태 초기화
+//                 sessionStorage.removeItem("couponApplied");
+//                 sessionStorage.removeItem("mileageApplied");
+//                 // 최종 금액 재계산
+//                 calculateFinalPrice();
+//                 return;
+//             }
+//             const token = $("meta[name='_csrf']").attr("content");  // CSRF 토큰 가져오기
+//             const header = $("meta[name='_csrf_header']").attr("content");  // CSRF 헤더 가져오기
+//             $.ajax({
+//                 url: "/apply",  // 서버에서 쿠폰 적용 요청
+//                 type: "POST",
+//                 contentType: "application/json",
+//                 data: JSON.stringify({couponCode, originalPrice: totalPrice}),  // 쿠폰 코드와 전체 금액 전달
+//                 beforeSend: function (xhr) {
+//                     xhr.setRequestHeader(header, token);  // CSRF 토큰을 요청 헤더에 추가
+//                 },
+//                 success: function (response) {
+//                     const discount = response.discount || 0;  // 서버에서 받은 할인 금액
+//                     discountedTotalPrice = totalPrice - discount;  // 쿠폰 할인 금액을 차감하여 총 금액 갱신
+//                     // 최소 결제 금액 1원 이상으로 설정
+//                     discountedTotalPrice = Math.max(discountedTotalPrice, 1);
+//                     // 최종 결제 금액 UI에 반영
+//                     $("#orderTotalPrice").text(discountedTotalPrice + "원");
+//                     alert(`최소 결제금액은 1원입니다!
+// 쿠폰이 적용되었습니다! 할인 금액: ${discount - 1}원`);
+//                 },
+//                 error: function (xhr) {
+//                     console.error("Error applying coupon:", xhr.responseText);
+//                     alert(xhr.responseText || "쿠폰 적용 중 오류가 발생했습니다.");
+//                 }
+//             });
+//         }
+
+        /** 쿠폰 적용 */
         function applyCoupon() {
-            const cartItems = collectCartItems();
-            const couponCode = $("#couponCode").val().trim();  // 쿠폰 코드 입력 값
-
-
-            if (!cartItems || cartItems.length === 0) {
-                alert("장바구니에 상품이 없습니다.");
-                return;
-            }
+            const couponCode = $("#couponCode").val().trim();
 
             if (!couponCode) {
                 alert("쿠폰 코드를 입력해주세요.");
                 return;
             }
 
-            let totalPrice = getOrderTotalPrice();  // 전체 주문 금액을 가져옵니다.
-            if (totalPrice <= 0) {
-                alert("적용할 상품을 선택해주세요.");
+            // 마일리지 적용 여부 확인
+            const mileageApplied = sessionStorage.getItem("mileageApplied") === "true";
+            if (mileageApplied) {
+                alert("마일리지를 먼저 사용한 경우 쿠폰을 적용할 수 없습니다. 쿠폰을 먼저 사용해주세요.");
+
+                // 마일리지 초기화 (메시지 표시 없이 처리)
+                resetMileage(false); // `false`로 메시지 비활성화
+
+                // 쿠폰 초기화
+                $("#couponCode").val("").prop("disabled", false);
+                $("#applyCouponButton").text("쿠폰 적용");
+                $("#applyCouponButton").attr("onclick", "applyCoupon()");
+                $("#discount").val(0);
+
+                // 상태 초기화
+                sessionStorage.removeItem("couponApplied");
+                sessionStorage.removeItem("mileageApplied");
+
+                // 최종 금액 재계산
+                calculateFinalPrice();
+
                 return;
             }
 
-            const token = $("meta[name='_csrf']").attr("content");  // CSRF 토큰 가져오기
-            const header = $("meta[name='_csrf_header']").attr("content");  // CSRF 헤더 가져오기
+            console.log(`Applying coupon: ${couponCode}`);
+
+            const {token, header} = setupAjax();
 
             $.ajax({
-                url: "/apply",  // 서버에서 쿠폰 적용 요청
+                url: "/apply",
                 type: "POST",
                 contentType: "application/json",
-                data: JSON.stringify({couponCode, originalPrice: totalPrice}),  // 쿠폰 코드와 전체 금액 전달
+                data: JSON.stringify({couponCode, originalPrice: calculateFinalPrice()}),
                 beforeSend: function (xhr) {
-                    xhr.setRequestHeader(header, token);  // CSRF 토큰을 요청 헤더에 추가
+                    xhr.setRequestHeader(header, token);
                 },
                 success: function (response) {
-                    const discount = response.discount || 0;  // 서버에서 받은 할인 금액
-                    discountedTotalPrice = totalPrice - discount;  // 쿠폰 할인 금액을 차감하여 총 금액 갱신
-                    // 최소 결제 금액 1원 이상으로 설정
-                    discountedTotalPrice = Math.max(discountedTotalPrice, 1);
-                    // 최종 결제 금액 UI에 반영
-                    $("#orderTotalPrice").text(discountedTotalPrice + "원");
-                    alert(`최소 결제금액은 1원입니다!
-쿠폰이 적용되었습니다! 할인 금액: ${discount - 1}원`);
+                    const discount = response.discount || 0;
+                    $("#discount").val(discount); // 쿠폰 할인 금액 반영
+                    calculateFinalPrice(); // 최종 금액 다시 계산
+                    alert(`쿠폰 적용 완료! 할인 금액: ${discount}원`);
+
+                    // 쿠폰 입력칸 비활성화 및 버튼 변경
+                    $("#couponCode").prop("disabled", true); // 쿠폰 입력 필드 비활성화
+                    $("#applyCouponButton").text("쿠폰 재등록"); // 버튼 텍스트 변경
+                    $("#applyCouponButton").attr("onclick", "resetCoupon()"); // 버튼 동작 변경
+
+                    // 상태 변경: 쿠폰 적용 플래그 설정
+                    sessionStorage.setItem("couponApplied", "true");
                 },
                 error: function (xhr) {
                     console.error("Error applying coupon:", xhr.responseText);
@@ -81,16 +165,12 @@
                 const price = parseFloat($("#price_" + cartItemId).data("price")) || 0;
                 const count = parseInt($("#count_" + cartItemId).val()) || 1;
                 let itemTotal = price * count;
-
                 // 가격이 0원이거나 음수인 경우 1원으로 고정되지 않도록 수정
                 itemTotal = Math.max(itemTotal, 1);
-
                 $("#totalPrice_" + cartItemId).text(itemTotal + "원");
-
                 // 총 금액에 더함
                 orderTotalPrice += itemTotal;
             });
-
             // 쿠폰 할인 적용 후 금액 계산 (할인된 금액으로 업데이트)
             orderTotalPrice = discountedTotalPrice > 0 ? discountedTotalPrice : orderTotalPrice;
             // 최소 결제 금액 보장 (1원 이상)
@@ -101,10 +181,8 @@
             }
             // UI에 최종 금액 표시
             $("#orderTotalPrice").text(orderTotalPrice + "원");
-
             return orderTotalPrice;
         }
-
     </script>
     <script th:inline="javascript">
         let discountedTotalPrice = 0;  // 쿠폰 할인 적용 후 총 금액
@@ -437,19 +515,62 @@
             alert(`마일리지 ${mileageToUse}원이 사용되었습니다.`);
         }
 
+        // 쿠폰 초기화 함수 (옵션: 알림 표시)
+        function resetCoupon(showAlert = true) {
+            console.log("Resetting coupon...");
 
-        // 마일리지 재설정
-        function resetMileage() {
-            // 마일리지 초기화
+            $("#couponCode").val("").prop("disabled", false); // 입력 필드 초기화 및 활성화
+            $("#applyCouponButton").text("쿠폰 적용"); // 버튼 텍스트 변경
+            $("#applyCouponButton").attr("onclick", "applyCoupon()"); // 버튼 동작 복원
+            $("#discount").val(0); // 할인 금액 초기화
+
+            // 상태 플래그 제거
+            sessionStorage.removeItem("couponApplied");
+
+            // 금액 재계산
+            calculateFinalPrice();
+
+            // 알림 표시
+            if (showAlert) {
+                alert("쿠폰이 초기화되었습니다. 다시 입력해주세요.");
+            }
+        }
+
+        // // 마일리지 재설정
+        // function resetMileage() {
+        //     // 마일리지 초기화
+        //     const originalAvailableMileage = parseInt($("#availableMileage").data("original")) || 0;
+        //     $("#mileageToUse").val(""); // 입력 필드 초기화
+        //     $("#previousMileageUsed").val("0"); // 사용한 마일리지 초기화
+        //     $("#availableMileage").text(originalAvailableMileage); // 잔액을 초기화된 값으로 업데이트
+        //     $("#mileageToUse").prop("disabled", false); // 마일리지 입력 필드를 다시 활성화
+        //
+        //     // 버튼 텍스트 재설정
+        //     $("#applyMileageButton").text("마일리지 사용"); // 버튼 텍스트 재설정
+        //     $("#applyMileageButton").attr("onclick", "applyMileage()"); // 버튼 동작 재설정
+        //
+        //     // 최종 금액 다시 계산
+        //     calculateFinalPrice(); // 최종 금액 다시 계산
+        // }
+
+        // 마일리지 초기화 함수 (옵션: 알림 표시)
+        function resetMileage(showMessage = true) {
             const originalAvailableMileage = parseInt($("#availableMileage").data("original")) || 0;
-            $("#mileageToUse").val(""); // 입력 필드 초기화
-            $("#previousMileageUsed").val("0"); // 사용한 마일리지 초기화
-            $("#availableMileage").text(originalAvailableMileage); // 잔액을 초기화된 값으로 업데이트
-            $("#mileageToUse").prop("disabled", false); // 마일리지 입력 필드를 다시 활성화
 
-            // 버튼 텍스트 재설정
-            $("#applyMileageButton").text("마일리지 사용"); // 버튼 텍스트 재설정
-            $("#applyMileageButton").attr("onclick", "applyMileage()"); // 버튼 동작 재설정
+            // 입력 필드 초기화
+            $("#mileageToUse").val("").prop("disabled", false);
+            $("#applyMileageButton").text("마일리지 사용");
+            $("#applyMileageButton").attr("onclick", "applyMileage()");
+            $("#availableMileage").text(originalAvailableMileage); // 잔액 초기화
+            $("#previousMileageUsed").val(0); // 사용량 초기화
+
+            // 상태 플래그 제거
+            sessionStorage.removeItem("mileageApplied");
+
+            // 알림 표시
+            if (showMessage) {
+                alert("마일리지가 초기화되었습니다. 다시 입력해주세요.");
+            }
 
             // 최종 금액 다시 계산
             calculateFinalPrice(); // 최종 금액 다시 계산
@@ -607,7 +728,7 @@
 
         <div class="text-center mt-3">
             <button type="button" class="btn btn-outline-dark" onclick="handleOrder()">주문하기</button>
-            <button type="button" class="btn btn-outline-dark" onclick="applyCoupon()">쿠폰 적용하기</button>
+            <button type="button" id="applyCouponButton" class="btn btn-outline-dark" onclick="applyCoupon()">쿠폰 적용하기</button>
         </div>
     </div>
 </div>

@@ -14,11 +14,11 @@
 
     <title>Shop Homepage - Start Bootstrap Template</title>
     <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <!-- Bootstrap icons-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
     <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="/css/styles.css" rel="stylesheet"/>
+    <link href="/css/styles.css" rel="stylesheet" />
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- jQuery(필수) -->
@@ -34,49 +34,42 @@
 </head>
 <th:block layout:fragment="css">
     <style>
-        .mgb-15 {
-            margin-bottom: 15px;
+        .mgb-15{
+            margin-bottom:15px;
         }
-
-        .mgt-30 {
-            margin-top: 30px;
+        .mgt-30{
+            margin-top:30px;
         }
-
-        .mgt-50 {
-            margin-top: 50px;
+        .mgt-50{
+            margin-top:50px;
         }
-
-        .repImgDiv {
-            margin-right: 15px;
-            height: auto;
-            width: 50%;
+        .repImgDiv{
+            margin-right:15px;
+            height:auto;
+            width:50%;
         }
-
-        .repImg {
-            width: 100%;
-            height: 400px;
+        .repImg{
+            width:100%;
+            height:400px;
         }
-
-        .wd50 {
-            height: auto;
-            width: 50%;
+        .wd50{
+            height:auto;
+            width:50%;
         }
-
-        .comments {
+        .comments{
             padding-left: 0px;
         }
 
 
-        #loadComment {
-        <!-- margin-left: 0 px;
-        --> display: flex;
+        #loadComment{
+        <!--    margin-left: 0px;-->
+            display: flex;
             align-items: center;
             padding-left: 0px;
             white-space: normal;
             word-wrap: break-word;
         }
-
-        #inputComment {
+        #inputComment{
             display: block;
             position: relative;
             width: 85%;
@@ -90,42 +83,26 @@
 
     <script th:inline="javascript">
         $(document).ready(function () {
+            console.log("Initializing page...");
+
             // 초기화
             calculateFinalPrice(); // 초기 결제 금액 계산
             fetchAvailableMileage(); // 마일리지 잔액 가져오기
             fetchMemberId(); // 로그인된 사용자 정보 가져오기
 
-            // // 수량 변경 시 금액 재계산 및 쿠폰/마일리지 재적용
+            // 수량 변경 시 금액 재계산
             // $("#count").change(function () {
-            //     console.log("Quantity changed. Recalculating price...");
-            //
-            //     // 1. 상품 가격 재계산
             //     calculateFinalPrice();
-            //
-            //     // 2. 쿠폰이 적용된 경우 초기화 후 자동 재적용
-            //     const couponApplied = sessionStorage.getItem("couponApplied") === "true";
-            //     if (couponApplied) {
-            //         console.log("Reapplying coupon due to quantity change...");
-            //         const couponCode = $("#couponCode").val().trim();
-            //         if (couponCode) {
-            //             applyCoupon(); // 쿠폰 자동 재적용
-            //         }
-            //     }
-            //
-            //     // 3. 마일리지가 적용된 경우 초기화
-            //     const mileageApplied = sessionStorage.getItem("mileageApplied") === "true";
-            //     if (mileageApplied) {
-            //         console.log("Resetting mileage due to quantity change...");
-            //         resetMileage(false); // 마일리지 초기화 (알림 비활성화)
-            //     }
             // });
 
             // 수량 변경 시 금액 재계산 및 쿠폰/마일리지 재적용
             $("#count").change(function () {
                 console.log("Quantity changed. Recalculating price...");
-                calculateFinalPrice(); // 상품 가격 재계산
 
-                // 쿠폰이 적용된 경우 초기화 후 자동 재적용
+                // 1. 상품 가격 재계산
+                calculateFinalPrice();
+
+                // 2. 쿠폰이 적용된 경우 초기화 후 자동 재적용
                 const couponApplied = sessionStorage.getItem("couponApplied") === "true";
                 if (couponApplied) {
                     console.log("Reapplying coupon due to quantity change...");
@@ -135,108 +112,106 @@
                     }
                 }
 
-                // 마일리지가 적용된 경우 초기화
+                // 3. 마일리지가 적용된 경우 초기화
                 const mileageApplied = sessionStorage.getItem("mileageApplied") === "true";
                 if (mileageApplied) {
                     console.log("Resetting mileage due to quantity change...");
                     resetMileage(false); // 마일리지 초기화 (알림 비활성화)
                 }
             });
-        });
 
-
-        // 상품평 작성 검증
-        $("#commentForm").on("submit", function (event) {
-            const commentContent = $("#inputComment").val().trim();
-            if (commentContent === "") {
-                alert("상품평 내용을 입력해주세요.");
-                event.preventDefault();
-            }
-        });
-
-        // 상품평 클릭 이벤트
-        $(".comments").on("click", "li", function () {
-            const rid = $(this).data("rid");
-            const itemId = $(this).data("itemid");
-
-            if (!rid || !itemId) {
-                console.error("itemId 또는 rid가 설정되지 않았습니다.");
-                return;
-            }
-
-            // 상품평 데이터 가져오기
-            $.ajax({
-                url: `/item/${itemId}/comments/${rid}`,
-                method: "GET",
-                success: function (reply) {
-                    $("#modalInputComment").val(reply.content);
-                    $("#modalInputCommenter").val(reply.createdBy);
-                    $("#modalInputCommentDate").val(reply.regTime);
-                    $("#modalInputCommentStar").val(reply.commentStar);
-                    $("#myModal").data("rid", reply.rid).data("itemid", itemId).modal("show");
-                },
-                error: function () {
-                    alert("상품평 정보를 불러오지 못했습니다.");
+            // 상품평 작성 검증
+            $("#commentForm").on("submit", function (event) {
+                const commentContent = $("#inputComment").val().trim();
+                if (commentContent === "") {
+                    alert("상품평 내용을 입력해주세요.");
+                    event.preventDefault();
                 }
             });
-        });
 
-        // 상품평 수정
-        $("#modalModBtn").on("click", function () {
-            const rid = $("#myModal").data("rid");
-            const itemId = $("#myModal").data("itemid");
-            const updatedContent = $("#modalInputComment").val();
-            const updatedCommentStar = $("#modalInputCommentStar").val();
+            // 상품평 클릭 이벤트
+            $(".comments").on("click", "li", function () {
+                const rid = $(this).data("rid");
+                const itemId = $(this).data("itemid");
 
-            if (!updatedContent.trim()) {
-                alert("상품평 내용을 입력해 주세요.");
-                return;
-            }
-
-            $.ajax({
-                url: `/item/${itemId}/comments/${rid}/edit`,
-                method: "POST",
-                data: {
-                    content: updatedContent,
-                    commentStar: updatedCommentStar,
-                    _csrf: $("meta[name='_csrf']").attr("content")
-                },
-                success: function () {
-                    location.reload();
-                },
-                error: function () {
-                    alert("상품평을 수정할 수 없습니다.");
+                if (!rid || !itemId) {
+                    console.error("itemId 또는 rid가 설정되지 않았습니다.");
+                    return;
                 }
+
+                // 상품평 데이터 가져오기
+                $.ajax({
+                    url: `/item/${itemId}/comments/${rid}`,
+                    method: "GET",
+                    success: function (reply) {
+                        $("#modalInputComment").val(reply.content);
+                        $("#modalInputCommenter").val(reply.createdBy);
+                        $("#modalInputCommentDate").val(reply.regTime);
+                        $("#modalInputCommentStar").val(reply.commentStar);
+                        $("#myModal").data("rid", reply.rid).data("itemid", itemId).modal("show");
+                    },
+                    error: function () {
+                        alert("상품평 정보를 불러오지 못했습니다.");
+                    }
+                });
+            });
+
+            // 상품평 수정
+            $("#modalModBtn").on("click", function () {
+                const rid = $("#myModal").data("rid");
+                const itemId = $("#myModal").data("itemid");
+                const updatedContent = $("#modalInputComment").val();
+                const updatedCommentStar = $("#modalInputCommentStar").val();
+
+                if (!updatedContent.trim()) {
+                    alert("상품평 내용을 입력해 주세요.");
+                    return;
+                }
+
+                $.ajax({
+                    url: `/item/${itemId}/comments/${rid}/edit`,
+                    method: "POST",
+                    data: {
+                        content: updatedContent,
+                        commentStar: updatedCommentStar,
+                        _csrf: $("meta[name='_csrf']").attr("content")
+                    },
+                    success: function () {
+                        location.reload();
+                    },
+                    error: function () {
+                        alert("상품평을 수정할 수 없습니다.");
+                    }
+                });
+            });
+
+            // 상품평 삭제
+            $("#modalRemoveBtn").on("click", function () {
+                const rid = $("#myModal").data("rid");
+                const itemId = $("#myModal").data("itemid");
+
+                $.ajax({
+                    url: `/item/${itemId}/comments/${rid}/delete`,
+                    method: "POST",
+                    data: {
+                        itemId: itemId, // itemId를 data에 추가=========================
+                        _csrf: $("meta[name='_csrf']").attr("content")
+                    },
+                    success: function () {
+                        location.reload();
+                    },
+                    error: function () {
+                        alert("상품평을 삭제할 수 없습니다.");
+                    }
+                });
+            });
+
+            $(".comments").on("mouseover", "li", function () {
+                $(this).css("background-color", "rgba(0,0,0,0.05)");
+            }).on("mouseout", "li", function () {
+                $(this).css("background-color", "rgba(0,0,0,0)");
             });
         });
-
-        // 상품평 삭제
-        $("#modalRemoveBtn").on("click", function () {
-            const rid = $("#myModal").data("rid");
-            const itemId = $("#myModal").data("itemid");
-
-            $.ajax({
-                url: `/item/${itemId}/comments/${rid}/delete`,
-                method: "POST",
-                data: {
-                    itemId: itemId, // itemId를 data에 추가=========================
-                    _csrf: $("meta[name='_csrf']").attr("content")
-                },
-                success: function () {
-                    location.reload();
-                },
-                error: function () {
-                    alert("상품평을 삭제할 수 없습니다.");
-                }
-            });
-        });
-
-        $(".comments").on("mouseover", "li", function () {
-            $(this).css("background-color", "rgba(0,0,0,0.05)");
-        }).on("mouseout", "li", function () {
-            $(this).css("background-color", "rgba(0,0,0,0)");
-        });
-
 
         /** 사용자 정보 가져오기 */
         function fetchMemberId() {
@@ -253,11 +228,13 @@
         }
 
 
+
+
         /** CSRF 토큰 설정 */
         function setupAjax() {
             const token = $("meta[name='_csrf']").attr("content");
             const header = $("meta[name='_csrf_header']").attr("content");
-            return {token, header};
+            return { token, header };
         }
 
         /** 최종 결제 금액 계산 */
@@ -325,6 +302,7 @@
             const count = parseInt($("#count").val()) || 1; // 상품 수량
             const discount = parseInt($("#discount").val()) || 0; // 쿠폰 할인 금액
             const totalPrice = price * count - discount; // 총 금액 (쿠폰 할인 적용 후)
+
             const maxUsableMileage = Math.min(originalAvailableMileage, totalPrice - 1);
 
             // 마일리지 입력 값 검증
@@ -349,9 +327,9 @@
                 return;
             }
 
-            // 상품의 가격보다 높은 마일리지를 사용하려는 경우
+
             if (mileageToUse > maxUsableMileage) {
-                alert(`상품의 가격보다 높게 사용할 수 없습니다. 최대 ${maxUsableMileage}원까지만 사용 가능합니다.`);
+                alert(`마일리지는 상품 가격을 초과할 수 없습니다. 최대 ${maxUsableMileage}원까지만 사용 가능합니다.`);
                 mileageToUseInput.val(maxUsableMileage);
                 return;
             }
@@ -395,10 +373,23 @@
             }
         }
 
+        // function resetCoupon() {
+        //     // 쿠폰 상태 초기화
+        //     $("#couponCode").val("").prop("disabled", false);
+        //     $("#applyCouponButton").text("쿠폰 적용").attr("onclick", "applyCoupon()");
+        //     $("#discount").val(0); // 할인 금액 초기화
+        //
+        //     // 마일리지도 함께 초기화
+        //     resetMileage();
+        //
+        //     calculateFinalPrice(); // 결제 금액 다시 계산
+        //     alert("쿠폰과 마일리지가 초기화되었습니다. 쿠폰과 마일리지를 다시 입력해주세요.");
+        // }
+
         // 쿠폰 초기화 함수 (옵션: 알림 표시)
         function resetCoupon(showAlert = true) {
-            console.log("Resetting coupon...");
 
+            resetMileage();
             $("#couponCode").val("").prop("disabled", false); // 입력 필드 초기화 및 활성화
             $("#applyCouponButton").text("쿠폰 적용"); // 버튼 텍스트 변경
             $("#applyCouponButton").attr("onclick", "applyCoupon()"); // 버튼 동작 복원
@@ -415,6 +406,55 @@
                 alert("쿠폰이 초기화되었습니다. 다시 입력해주세요.");
             }
         }
+
+        // function applyCoupon() {
+        //     const couponCode = $("#couponCode").val().trim();
+        //
+        //     if (!couponCode) {
+        //         alert("쿠폰 코드를 입력해주세요.");
+        //         return;
+        //     }
+        //
+        //     // 마일리지 적용 여부 확인
+        //     const mileageApplied = sessionStorage.getItem("mileageApplied") === "true";
+        //     if (mileageApplied) {
+        //         alert("마일리지를 이미 사용한 경우 쿠폰을 적용할 수 없습니다. 쿠폰 먼저 사용해주세요.");
+        //         resetCoupon();
+        //         return;
+        //     }
+        //
+        //     const totalPrice = calculateFinalPrice(); // 최종 결제 금액 계산
+        //     const { token, header } = setupAjax();
+        //
+        //     $.ajax({
+        //         url: "/apply",
+        //         type: "POST",
+        //         contentType: "application/json",
+        //         data: JSON.stringify({ couponCode, originalPrice: totalPrice }),
+        //         beforeSend: function (xhr) {
+        //             xhr.setRequestHeader(header, token);
+        //         },
+        //         success: function (response) {
+        //             const discount = response.discount || 0;
+        //             $("#discount").val(discount); // 할인 금액 반영
+        //             calculateFinalPrice(); // 결제 금액 다시 계산
+        //
+        //             alert(`쿠폰 적용 완료! 할인 금액: ${discount}원`);
+        //
+        //             // UI 업데이트
+        //             $("#couponCode").prop("disabled", true);
+        //             $("#applyCouponButton").text("쿠폰 재설정").attr("onclick", "resetCoupon()");
+        //
+        //             // 쿠폰 적용 상태 저장
+        //             sessionStorage.setItem("couponApplied", "true");
+        //         },
+        //         error: function (xhr) {
+        //             console.error("Error applying coupon:", xhr.responseText);
+        //             alert(xhr.responseText || "쿠폰 적용 중 오류가 발생했습니다.");
+        //         }
+        //     });
+        // }
+        //
 
         /** 쿠폰 적용 */
         function applyCoupon() {
@@ -451,37 +491,41 @@
 
             console.log(`Applying coupon: ${couponCode}`);
 
-            const {token, header} = setupAjax();
+            const { token, header } = setupAjax();
 
             $.ajax({
                 url: "/apply",
                 type: "POST",
                 contentType: "application/json",
-                data: JSON.stringify({couponCode, originalPrice: calculateFinalPrice()}),
+                data: JSON.stringify({
+                    couponCode: couponCode,
+                    originalPrice: calculateFinalPrice()
+                }),
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader(header, token);
                 },
                 success: function (response) {
+                    if (response === "없는 쿠폰입니다. 다시 시도해주세요.") {
+                        alert(response);
+                        $("#couponCode").val(""); // 입력 필드 초기화
+                        return;
+                    }
+
                     const discount = response.discount || 0;
-                    $("#discount").val(discount); // 쿠폰 할인 금액 반영
-                    calculateFinalPrice(); // 최종 금액 다시 계산
+                    $("#discount").val(discount);
+                    calculateFinalPrice();
                     alert(`쿠폰 적용 완료! 할인 금액: ${discount}원`);
-
-                    // 쿠폰 입력칸 비활성화 및 버튼 변경
-                    $("#couponCode").prop("disabled", true); // 쿠폰 입력 필드 비활성화
-                    $("#applyCouponButton").text("쿠폰 재등록"); // 버튼 텍스트 변경
-                    $("#applyCouponButton").attr("onclick", "resetCoupon()"); // 버튼 동작 변경
-
-                    // 상태 변경: 쿠폰 적용 플래그 설정
+                    $("#couponCode").prop("disabled", true);
+                    $("#applyCouponButton").text("쿠폰 재등록");
+                    $("#applyCouponButton").attr("onclick", "resetCoupon()");
                     sessionStorage.setItem("couponApplied", "true");
                 },
                 error: function (xhr) {
-                    console.error("Error applying coupon:", xhr.responseText);
-                    alert(xhr.responseText || "쿠폰 적용 중 오류가 발생했습니다.");
+                    alert(xhr.responseJSON?.message || "쿠폰 적용 중 오류가 발생했습니다.");
                 }
             });
-        }
 
+        }
         /** 결제 요청 */
         function handleOrder() {
             const price = calculateFinalPrice();
@@ -524,7 +568,7 @@
                 pay_method: "card",
                 merchant_uid: itemId + "_" + new Date().getTime(),
                 amount: price,
-                buyer_name: buyerName,
+                buyer_name:  buyerName,
                 buyer_email: buyerEmail,
                 name: itemName,
                 buyer_tel: "01012345678",
@@ -541,7 +585,7 @@
 
         /** 주문 및 마일리지 처리 */
         function processOrder(price, mileageToUse) {
-            const {token, header} = setupAjax();
+            const { token, header } = setupAjax();
 
             // 1. 주문 데이터 저장
             $.ajax({
@@ -593,7 +637,7 @@
         }
 
         function addCart() {
-            const {token, header} = setupAjax();  // CSRF 토큰을 설정하는 함수
+            const { token, header } = setupAjax();  // CSRF 토큰을 설정하는 함수
 
             // URL 및 요청 데이터 준비
             var url = "/cart";
@@ -642,15 +686,13 @@
 
     <div class="d-flex">
         <div class="repImgDiv">
-            <img th:src="${item.itemImgDtoList[0].imgUrl}" class="rounded repImg" th:alt="${item.itemNm}">
+            <img th:src="${item.itemImgDtoList[0].imgUrl}" class = "rounded repImg" th:alt="${item.itemNm}">
         </div>
         <div class="wd50">
-            <span th:if="${item.itemSellStatus == T(com.shop.constant.ItemSellStatus).SELL}"
-                  class="badge badge-primary mgb-15">
+            <span th:if="${item.itemSellStatus == T(com.shop.constant.ItemSellStatus).SELL}" class="badge badge-primary mgb-15">
                 판매중
             </span>
-            <span th:unless="${item.itemSellStatus == T(com.shop.constant.ItemSellStatus).SELL}"
-                  class="badge btn-danger mgb-15">
+            <span th:unless="${item.itemSellStatus == T(com.shop.constant.ItemSellStatus).SELL}" class="badge btn-danger mgb-15" >
                 품절
             </span>
             <div class="h4" th:text="${item.itemNm}"></div>
@@ -673,9 +715,7 @@
             <!-- 쿠폰 입력 폼 추가 -->
             <div class="text-right">
                 <input type="text" id="couponCode" class="form-control w-50 mgb-15" placeholder="쿠폰 코드 입력">
-                <button type="button" id="applyCouponButton" class="btn btn-outline-dark btn-lg"
-                        onclick="applyCoupon()">쿠폰 적용하기
-                </button>
+                <button type="button" id="applyCouponButton" class="btn btn-outline-dark btn-lg" onclick="applyCoupon()">쿠폰 적용하기</button>
                 <input type="hidden" id="previousMileageToUse" value="0">
                 <input type="hidden" id="discount" value="0">
             </div>
@@ -721,14 +761,12 @@
     </div>
 
     <div th:each="itemImg : ${item.itemImgDtoList}" class="text-center">
-        <img th:if="${not #strings.isEmpty(itemImg.imgUrl)}" th:src="${itemImg.imgUrl}" class="rounded mgb-15"
-             width="800">
+        <img th:if="${not #strings.isEmpty(itemImg.imgUrl)}" th:src="${itemImg.imgUrl}" class="rounded mgb-15" width="800">
 
     </div>
     <hr class="my-4">
     <div th:if="${comments != null}">
-        <form role="form" method="post" th:object="${commentDto}"
-              th:action="@{/item/{itemId}/comments(itemId=${itemId})}" id="commentForm">
+        <form role="form" method="post" th:object="${commentDto}" th:action="@{/item/{itemId}/comments(itemId=${itemId})}" id="commentForm">
             <p class="h5">상품리뷰</p><!--리뷰 카운트 넣으면 좋을듯-->
             <div class="form-group" sec:authorize="isAuthenticated()">
                 <div>
@@ -741,11 +779,8 @@
                     </select>
                 </div>
                 <div class="d-flex mb-4">
-                    <input type="text" th:field="*{content}" class="form-control me-2" placeholder="상품평을 입력해주세요"
-                           id="inputComment">
-                    <button type="submit" th:formaction="@{'/item/'+${item.id}+'/comments'}"
-                            class="btn btn-outline-dark" id="comment btn">작성
-                    </button>
+                    <input type="text" th:field="*{content}" class="form-control me-2" placeholder="상품평을 입력해주세요" id="inputComment">
+                    <button type="submit" th:formaction="@{'/item/'+${item.id}+'/comments'}" class="btn btn-outline-dark"id="comment btn">작성</button>
                 </div>
             </div>
             <div>
@@ -754,12 +789,10 @@
                         th:each="comment : ${comments}"
                         th:data-rid="${comment.rid}"
                         th:data-itemid="${item.id}" id="loadComment"
-                        style="padding-top: 10px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
-                        <!-- 상품평의 ID를 data-rid로 설정 --> <!-- 아이템의 ID를 data-itemid로 설정 -->
+                        style="padding-top: 10px; padding-bottom: 10px; border-bottom: 1px solid #ddd;"><!-- 상품평의 ID를 data-rid로 설정 --> <!-- 아이템의 ID를 data-itemid로 설정 -->
                         <span class="col-2">
                             <div class="d-flex justify-content-center small text-warning">
-                                <div th:each="i : ${#numbers.sequence(1, comment.commentStar.ordinal() + 1)}"
-                                     class="bi-star-fill"></div>
+                                <div th:each="i : ${#numbers.sequence(1, comment.commentStar.ordinal() + 1)}" class="bi-star-fill"></div>
                             </div>
                         </span>
                         <span class="col-2">[[${#strings.substringBefore(comment.createdBy, '@')}]]</span>
@@ -772,9 +805,8 @@
         </form>
     </div>
 
-    <div class="modal" id="myModal" sec:authorize="isAuthenticated()" role="dialog" aria-labelledby="comment-dialog"
-         aria-modal="true"><!--로그인 한 사용자만 모달창을 볼 수 있도록-->
-        <div class="modal-dialog" role="document" tabindex="-1">
+    <div class="modal" id="myModal" sec:authorize="isAuthenticated()" role="dialog" aria-labelledby="comment-dialog" aria-modal="true"><!--로그인 한 사용자만 모달창을 볼 수 있도록-->
+        <div class="modal-dialog" role="document" tabindex="-1" >
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="myModalLabel">상품평 수정 & 삭제</h5>
@@ -800,23 +832,20 @@
                 <!-- 작성자 (readonly) -->
                 <div class="modal-body">
                     <label for="modalInputCommenter">작성자</label>
-                    <input id="modalInputCommenter" type="text" class="form-control" name="createdBy" disabled
-                           readonly/>
+                    <input id="modalInputCommenter" type="text" class="form-control" name="createdBy" disabled readonly />
                 </div>
 
                 <!-- 작성시간 (readonly) -->
                 <div class="modal-body">
                     <label for="modalInputCommentDate">작성일시</label>
-                    <input id="modalInputCommentDate" type="text" class="form-control" name="regTime" disabled
-                           readonly/>
+                    <input id="modalInputCommentDate" type="text" class="form-control" name="regTime" disabled readonly />
                 </div>
 
                 <!-- 수정 및 삭제 버튼 -->
                 <div class="modal-footer">
                     <button id="modalModBtn" class="btn btn-outline-dark">수정</button>
                     <button id="modalRemoveBtn" class="btn btn-danger">삭제</button>
-                    <button id="modalCloseBtn" type="button" class="btn btn-dark" data-bs-dismiss="modal"
-                            aria-label="Close">닫기
+                    <button id="modalCloseBtn" type="button" class="btn btn-dark" data-bs-dismiss="modal" aria-label="Close">닫기
                     </button>
                 </div>
             </div>
