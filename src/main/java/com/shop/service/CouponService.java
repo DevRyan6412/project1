@@ -48,9 +48,15 @@ public class CouponService {
     }
 
     // 쿠폰 조회
+//    public Coupon findCouponByCode(String couponCode) {
+//        return couponRepository.findById(couponCode)
+//                .orElseThrow(() -> new EntityNotFoundException("쿠폰이 존재하지 않습니다: " + couponCode));
+//    }
+
+    // 쿠폰 조회
     public Coupon findCouponByCode(String couponCode) {
         return couponRepository.findById(couponCode)
-                .orElseThrow(() -> new EntityNotFoundException("쿠폰이 존재하지 않습니다: " + couponCode));
+                .orElseThrow(() -> new IllegalArgumentException("쿠폰이 존재하지 않습니다."));
     }
 
     // 쿠폰 할인 계산
@@ -76,4 +82,6 @@ public class CouponService {
                         coupon.getDiscountAmount()))
                 .collect(Collectors.toList());
     }
+
+
 }

@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -45,20 +46,42 @@ public class CouponController {
         }
     }
 
+//    @PostMapping("/apply")
+//    public ResponseEntity<?> applyCoupon(@RequestBody CouponApplyRequest request) {
+//        try {
+//            double discount = couponService.applyCoupon(request.getCouponCode(), request.getOriginalPrice());
+//            CouponApplyResponse response = new CouponApplyResponse(
+//                    request.getOriginalPrice(),
+//                    discount,
+//                    request.getOriginalPrice() - discount
+//            );
+//            return ResponseEntity.ok(response);
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        }
+//    }
+
     @PostMapping("/apply")
-    public ResponseEntity<?> applyCoupon(@RequestBody CouponApplyRequest request) {
+    public ResponseEntity<?> applyCoupon(@RequestBody CouponApplyRequest request,
+                                         @SessionAttribute(name = "mileageApplied", required = false) Boolean mileageApplied,
+                                         HttpSession session) {
         try {
+            if (Boolean.TRUE.equals(mileageApplied)) {
+                return ResponseEntity.badRequest().body("쿠폰을 먼저 적용해주세요. 현재 마일리지가 이미 적용된 상태입니다.");
+            }
             double discount = couponService.applyCoupon(request.getCouponCode(), request.getOriginalPrice());
             CouponApplyResponse response = new CouponApplyResponse(
                     request.getOriginalPrice(),
                     discount,
                     request.getOriginalPrice() - discount
             );
+            session.setAttribute("couponApplied", true);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     @DeleteMapping("/coupon/delete/{couponCode}")
     public ResponseEntity<?> deleteCoupon(@PathVariable String couponCode) {
