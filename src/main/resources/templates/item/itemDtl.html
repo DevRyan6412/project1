@@ -83,7 +83,6 @@
 
     <script th:inline="javascript">
         $(document).ready(function () {
-            console.log("Initializing page...");
 
             // 초기화
             calculateFinalPrice(); // 초기 결제 금액 계산
@@ -97,7 +96,6 @@
 
             // 수량 변경 시 금액 재계산 및 쿠폰/마일리지 재적용
             $("#count").change(function () {
-                console.log("Quantity changed. Recalculating price...");
 
                 // 1. 상품 가격 재계산
                 calculateFinalPrice();
@@ -105,7 +103,6 @@
                 // 2. 쿠폰이 적용된 경우 초기화 후 자동 재적용
                 const couponApplied = sessionStorage.getItem("couponApplied") === "true";
                 if (couponApplied) {
-                    console.log("Reapplying coupon due to quantity change...");
                     const couponCode = $("#couponCode").val().trim();
                     if (couponCode) {
                         applyCoupon(); // 쿠폰 자동 재적용
@@ -115,7 +112,6 @@
                 // 3. 마일리지가 적용된 경우 초기화
                 const mileageApplied = sessionStorage.getItem("mileageApplied") === "true";
                 if (mileageApplied) {
-                    console.log("Resetting mileage due to quantity change...");
                     resetMileage(false); // 마일리지 초기화 (알림 비활성화)
                 }
             });
@@ -226,9 +222,6 @@
                 }
             });
         }
-
-
-
 
         /** CSRF 토큰 설정 */
         function setupAjax() {
@@ -485,11 +478,8 @@
 
                 // 최종 금액 재계산
                 calculateFinalPrice();
-
                 return;
             }
-
-            console.log(`Applying coupon: ${couponCode}`);
 
             const { token, header } = setupAjax();
 
