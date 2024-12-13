@@ -105,22 +105,48 @@ public class ItemController {
         return "item/itemMng";
     }
 
+//    @GetMapping(value = "/item/{itemId}")
+//    public String itemDtl(Model model, @PathVariable("itemId") Long itemId, Principal principal){
+//        ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
+//        model.addAttribute("item", itemFormDto);
+//
+//        // 회원 정보 추가
+//        if (principal != null) {
+//            String email = principal.getName();
+//            Member member = memberService.findByEmail(email);
+//            model.addAttribute("member", member); // 회원 정보를 모델에 추가
+//        } else {
+//            model.addAttribute("member", null); // 비로그인 상태일 때 null 설정
+//        }
+//
+//
+//        // 해당 아이템에 대한 댓글 목록 조회
+//        List<Comment> comments = commentService.getCommentsByItem(itemId);
+//        model.addAttribute("comments", comments);
+//        model.addAttribute("commentDto", new CommentDto());
+//        return "item/itemDtl";
+//    }
+
     @GetMapping(value = "/item/{itemId}")
-    public String itemDtl(Model model, @PathVariable("itemId") Long itemId, Principal principal){
+    public String itemDtl(Model model, @PathVariable("itemId") Long itemId, Principal principal) {
         ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
         model.addAttribute("item", itemFormDto);
 
         // 회원 정보 추가
+        Member member = new Member();
         if (principal != null) {
             String email = principal.getName();
-            Member member = memberService.findByEmail(email);
-            model.addAttribute("member", member); // 회원 정보를 모델에 추가
+            member = memberService.findByEmail(email);
+        } else {
+            member.setName("게스트"); // 기본 이름 설정
         }
+        model.addAttribute("member", member);
 
         // 해당 아이템에 대한 댓글 목록 조회
         List<Comment> comments = commentService.getCommentsByItem(itemId);
         model.addAttribute("comments", comments);
         model.addAttribute("commentDto", new CommentDto());
+
         return "item/itemDtl";
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -27,16 +28,23 @@ public class MileageController {
 
     // 마일리지 요약 조회 (현재 로그인한 사용자)
     @GetMapping("/summary")
-    public ResponseEntity<MileageSummaryDTO> getMileageSummary() {
+    public ResponseEntity<MileageSummaryDTO> getMileageSummary(Principal principal) {
         Member currentMember = memberService.getCurrentLoggedInMember();
 
-        if (currentMember == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        if (principal == null) {
+            // 로그인하지 않은 경우 기본값 반환
+            return ResponseEntity.ok(new MileageSummaryDTO());
         }
+
+//        if (currentMember == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+//        }
+        
 
         MileageSummaryDTO summary = mileageService.getMileageSummary(currentMember.getId());
         return ResponseEntity.ok(summary);
     }
+
 
     // 마일리지 내역 조회 (현재 로그인한 사용자)
     @GetMapping("/history")
