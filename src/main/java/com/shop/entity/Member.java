@@ -11,32 +11,35 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="member")
-@Getter
-@Setter
-@ToString
+@Getter @Setter @ToString
 public class Member extends BaseEntity {
 
     @Id
+//    @Column(name="member_id")
     @Column
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // IDENTITY 전략 사용
     private Long id;
 
     private String name;
 
     @Column(unique = true)
     private String email;
+
     private String password;
+
     private String address;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    // 마일리지 설정 및 조회 메소드 추가
-    @Getter
-    @Setter
-    @Column(nullable = false)
-    private int availableMileage = 0; // 사용 가능한 마일리지 필드 추가
+    @Column(name = "business_registration_number")
+    private String businessNumber;
 
+    @Column(nullable = false, columnDefinition = "integer default 0")  // default 값 설정
+//    @Column(nullable = false)  // 민혁
+    private int availableMileage = 0;
+
+    // createMember 메서드는 그대로 유지
     public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder){
         Member member = new Member();
         member.setName(memberFormDto.getName());
@@ -44,7 +47,9 @@ public class Member extends BaseEntity {
         member.setAddress(memberFormDto.getAddress());
         String password = passwordEncoder.encode(memberFormDto.getPassword());
         member.setPassword(password);
-        member.setRole(Role.ADMIN);
+        member.setRole(memberFormDto.getRole());
+        member.setBusinessNumber(memberFormDto.getBusinessNumber());
+        member.setAvailableMileage(0);
         return member;
     }
 }
