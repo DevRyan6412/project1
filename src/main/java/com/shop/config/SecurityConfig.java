@@ -48,8 +48,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {//스프링부
                 .logoutSuccessUrl("/");
 
         http.authorizeRequests()
-                .mvcMatchers("/", "/members/**","/item/**","/images/**").permitAll() // members,item,images뒤에 어떤 URL이 오든 허락한다
+                .mvcMatchers("/", "/members/**","/item/**","/images/**","/api/mileage/summary", "/api/members/info").permitAll() // members,item,images뒤에 어떤 URL이 오든 허락한다
                 .mvcMatchers("/admin/**").hasRole("ADMIN") //admin다음에 어떤 URL오든 admin자격을 가진유저만 허용
+                .mvcMatchers("/order").authenticated() // 주문 API는 인증된 사용자만 접근 가능
+//                .mvcMatchers("/api/mileage/summary", "/api/members/info").permitAll() // API 경로 인증 없이 허용
                 .anyRequest().authenticated();
         http.exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint());

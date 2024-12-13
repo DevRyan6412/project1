@@ -6,6 +6,7 @@
 
 
 </style>
+
 <div th:fragment="header">
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container px-4 px-lg-5">
@@ -17,28 +18,29 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Category</a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
-              <li><a class="dropdown-item" href="#!">Sale</a></li>
+              <li><a class="dropdown-item" href="/category/items?category=New">New Arrivals</a></li>
               <li><hr class="dropdown-divider" /></li>
-              <li><a class="dropdown-item" href="#!">Bed</a></li>
-              <li><a class="dropdown-item" href="#!">Table</a></li>
-              <li><a class="dropdown-item" href="#!">Chair</a></li>
-              <li><a class="dropdown-item" href="#!">Storage/Organization</a></li>
-              <li><a class="dropdown-item" href="#!">Light</a></li>
-              <li><a class="dropdown-item" href="#!">Decorations</a></li>
+<!--              <li><a class="dropdown-item" href="/category/items?category=">All</a></li>-->
+              <li><a class="dropdown-item" href="/">All</a></li>
+              <li><a class="dropdown-item" href="/category/items?category=Bed">Bed</a></li>
+              <li><a class="dropdown-item" href="/category/items?category=Table">Table</a></li>
+              <li><a class="dropdown-item" href="/category/items?category=Chair">Chair</a></li>
+              <li><a class="dropdown-item" href="/category/items?category=Storage">Storage/Organization</a></li>
+              <li><a class="dropdown-item" href="/category/items?category=Light">Light</a></li>
+              <li><a class="dropdown-item" href="/category/items?category=Decorations">Decorations</a></li>
             </ul>
           </li>
-          <li class="nav-item"><a class="nav-link" aria-current="page" href="#!">None1</a></li>
-          <li class="nav-item"><a class="nav-link" href="#!">None2</a></li>
-          <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+<!--          <li class="nav-item"><a class="nav-link" aria-current="page" href="#!">None1</a></li>-->
+<!--          <li class="nav-item"><a class="nav-link" href="#!">None2</a></li>-->
+          <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('ROLE_MANAGER')">
             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Seller</a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                <a class="dropdown-item" href="/admin/item/new">상품 등록</a>
+              <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_MANAGER')">
+                <a class="dropdown-item" href="/seller/item/new">상품 등록</a>
               </li>
               <li><hr class="dropdown-divider" /></li>
-              <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                <a class="dropdown-item" href="/admin/items">상품 관리</a>
+              <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_MANAGER')">
+                <a class="dropdown-item" href="/seller/items">상품 관리</a>
               </li>
             </ul>
           </li>
@@ -51,6 +53,10 @@
               <li><hr class="dropdown-divider" /></li>
               <li sec:authorize="isAuthenticated()">
                 <a class="dropdown-item" href="#!">Q & A</a>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li sec:authorize="isAuthenticated()">
+                <a class="dropdown-item" th:href="@{/mypage}">My Profile</a>
               </li>
             </ul>
           </li>
@@ -81,7 +87,7 @@
           <button class="btn btn-outline-dark" type="submit">
             <i class="bi-cart-fill me-1"></i>
             Cart
-            <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+<!--            <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>-->
           </button>
         </form>
       </div>

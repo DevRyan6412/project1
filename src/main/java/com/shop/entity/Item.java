@@ -38,12 +38,16 @@ public class Item extends BaseEntity {
     @Enumerated(EnumType.STRING) //문자 그대로 표시
     private ItemSellStatus itemSellStatus; //상품 판매 상태
 
+    @Column(nullable = false)
+    private String category; //카테고리
+
     public void updateItem(ItemFormDto itemFormDto) {
         this.itemNm = itemFormDto.getItemNm();
         this.price = itemFormDto.getPrice();
         this.stockNumber = itemFormDto.getStockNumber();
         this.itemDetail = itemFormDto.getItemDetail();
         this.itemSellStatus = itemFormDto.getItemSellStatus();
+        this.category = itemFormDto.getCategory(); //카테고리
     }
 
     public void removeStock(int stockNumber){

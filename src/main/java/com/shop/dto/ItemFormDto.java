@@ -30,6 +30,8 @@ public class ItemFormDto {
 
     private ItemSellStatus itemSellStatus;
 
+    private String category; //카테고리
+
     private List<ItemImgDto> itemImgDtoList = new ArrayList<>();
 
     private List<Long> itemImgIds = new ArrayList<>();
