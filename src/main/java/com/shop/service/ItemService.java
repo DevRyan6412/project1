@@ -29,17 +29,17 @@ public class ItemService {
     private final ItemImgService itemImgService;
     private final ItemImgRepository itemImgRepository;
 
-    public Long saveItem(ItemFormDto itemFormDto, List<MultipartFile> itemImgFileList) throws Exception{
+    public Long saveItem(ItemFormDto itemFormDto, List<MultipartFile> itemImgFileList) throws Exception {
 
         //상품등록
         Item item = itemFormDto.createItem();
         itemRepository.save(item);
 
         //이미지 등록
-        for(int i=0; i<itemImgFileList.size(); i++){
+        for (int i = 0; i < itemImgFileList.size(); i++) {
             ItemImg itemImg = new ItemImg();
             itemImg.setItem(item);
-            if(i == 0) {
+            if (i == 0) {
                 itemImg.setRepimgYn("Y");
             } else {
                 itemImg.setRepimgYn("N");
@@ -73,19 +73,19 @@ public class ItemService {
         List<Long> itemImgIds = itemFormDto.getItemImgIds();
 
         //이미지 등록
-        for(int i=0; i<itemImgFileList.size(); i++){
+        for (int i = 0; i < itemImgFileList.size(); i++) {
             itemImgService.updateItemImg(itemImgIds.get(i), itemImgFileList.get(i));
         }
         return item.getId();
     }
 
     @Transactional(readOnly = true)
-    public Page<Item> getAdminItemPage(ItemSearchDto itemSearchDto, Pageable pageable){
+    public Page<Item> getAdminItemPage(ItemSearchDto itemSearchDto, Pageable pageable) {
         return itemRepository.getAdminItemPage(itemSearchDto, pageable);
     }
 
     @Transactional(readOnly = true)
-    public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable){
+    public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable) {
         return itemRepository.getMainItemPage(itemSearchDto, pageable);
     }
 }
