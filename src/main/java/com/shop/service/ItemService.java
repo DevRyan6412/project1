@@ -28,6 +28,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemImgService itemImgService;
     private final ItemImgRepository itemImgRepository;
+    private final CommentService commentService;
 
     public Long saveItem(ItemFormDto itemFormDto, List<MultipartFile> itemImgFileList) throws Exception {
 
@@ -87,5 +88,29 @@ public class ItemService {
     @Transactional(readOnly = true)
     public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable) {
         return itemRepository.getMainItemPage(itemSearchDto, pageable);
+    }
+
+    //카테고리별 찾기
+    @Transactional(readOnly = true)
+    public Page<MainItemDto> getMainItemsByCategory(String category, Pageable pageable) {
+        Page<Item> items = itemRepository.findByCategory(category, pageable); // 기존에 카테고리별로 Item을 가져오는 코드
+
+        // 아이템 -> MainItemDto 변환
+        Page<MainItemDto> mainItemDtos = items.map(item -> {
+            // 아이템에 대한 평균 별점 계산
+            Double averageStar = commentService.getAverageStar(item.getId());
+
+            // ItemImg 테이블에서 해당 Item의 대표 이미지를 가져오는 코드 추가
+            String itemUrl = null;
+            List<ItemImg> itemImgs = itemImgRepository.findByItemId(item.getId());
+            if (!itemImgs.isEmpty()) {
+                // 대표 이미지가 있으면 첫 번째 이미지의 URL 사용
+                itemUrl = itemImgs.get(0).getImgUrl(); // 첫 번째 이미지를 사용
+            }
+
+            // MainItemDto 반환
+            return new MainItemDto(item.getId(), item.getItemNm(), item.getItemDetail(), itemUrl, item.getPrice(), averageStar);
+        });
+        return mainItemDtos;
     }
 }

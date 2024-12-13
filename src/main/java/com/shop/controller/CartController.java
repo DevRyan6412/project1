@@ -3,9 +3,7 @@ package com.shop.controller;
 import com.shop.dto.CartDetailDto;
 import com.shop.dto.CartItemDto;
 import com.shop.dto.CartOrderDto;
-import com.shop.entity.Member;
 import com.shop.service.CartService;
-import com.shop.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +22,6 @@ import java.util.List;
 public class CartController {
 
     private final CartService cartService;
-    private final MemberService memberService;
-
-
 
     // 장바구니에 상품 추가
     @PostMapping(value = "/cart")
@@ -40,7 +35,6 @@ public class CartController {
             }
             return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
         }
-
 
         String email = principal.getName();
         Long cartItemId;
@@ -56,14 +50,6 @@ public class CartController {
     // 장바구니 조회
     @GetMapping(value = "/cart")
     public String cartHist(Principal principal, Model model) {
-
-        // 회원 정보 추가
-        if (principal != null) {
-            String email = principal.getName();
-            Member member = memberService.findByEmail(email);
-            model.addAttribute("member", member); // 회원 정보를 모델에 추가
-        }
-
         List<CartDetailDto> cartDetailList = cartService.getCartList(principal.getName());
         model.addAttribute("cartItems", cartDetailList);
         return "cart/cartList";

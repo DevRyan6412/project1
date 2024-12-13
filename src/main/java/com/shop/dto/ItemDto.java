@@ -22,4 +22,5 @@ public class ItemDto {
 
     private LocalDateTime updateTime;
 
+    private String category; //카테고리
 }
