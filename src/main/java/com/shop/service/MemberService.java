@@ -50,6 +50,7 @@ public class MemberService implements UserDetailsService {
                 .build();
     }
 
+<<<<<<< Updated upstream
     // 현재 로그인한 회원의 정보를 반환하는 메서드
     public Member getCurrentLoggedInMember() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -61,3 +62,13 @@ public class MemberService implements UserDetailsService {
         return memberRepository.findByEmail(email);
     }
 }
+=======
+    public Member findByEmail(String email) {
+        Member member = memberRepository.findByEmail(email);
+        if (member == null) {
+            throw new IllegalArgumentException("사용자를 찾을 수 없습니다: " + email);
+        }
+        return member;
+    }
+}
+>>>>>>> Stashed changes
