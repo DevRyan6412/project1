@@ -5,13 +5,13 @@
 
 <head>
     <meta name="isLoggedIn" th:content="${#authentication.name != 'anonymousUser'}" />
-        <meta name="_csrf" th:content="${_csrf.token}"/>
-        <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
-<!--    <th:block th:if="${#authentication.principal != null}">-->
-<!--        <meta name="_csrf" th:content="${_csrf.token}"/>-->
-<!--        <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
-<!--    </th:block>-->
+    <!--    <th:block th:if="${#authentication.principal != null}">-->
+    <!--        <meta name="_csrf" th:content="${_csrf.token}"/>-->
+    <!--        <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
+    <!--    </th:block>-->
     <title>Shop Homepage - Start Bootstrap Template</title>
     <!-- Favicon-->
     <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
@@ -94,7 +94,7 @@
             // 초기화
             calculateFinalPrice(); // 초기 결제 금액 계산
             fetchAvailableMileage(); // 마일리지 잔액 가져오기
-            fetchMemberId(); // 로그인된 사용자 정보 가져오기
+            // fetchMemberId(); // 로그인된 사용자 정보 가져오기
 
             // 수량 변경 시 금액 재계산 및 쿠폰/마일리지 재적용
             $("#count").change(function () {
@@ -211,27 +211,27 @@
             });
         });
 
-        function fetchMemberId() {
-            const isLoggedIn = $("meta[name='isLoggedIn']").attr("content") === "true"; // 로그인 여부 확인
-            if (!isLoggedIn) return;
-
-            const csrfToken = $("meta[name='_csrf']").attr("content");
-            const csrfHeader = $("meta[name='_csrf_header']").attr("content");
-
-            $.ajax({
-                url: "/api/members/info",
-                type: "GET",
-                headers: {
-                    [csrfHeader]: csrfToken, // CSRF 토큰 포함
-                },
-                success: function (memberId) {
-                    $("#memberId").text(memberId);
-                },
-                error: function () {
-                    console.warn("사용자 정보를 가져오는 데 실패했습니다.");
-                }
-            });
-        }
+        // function fetchMemberId() {
+        //     const isLoggedIn = $("meta[name='isLoggedIn']").attr("content") === "true"; // 로그인 여부 확인
+        //     if (!isLoggedIn) return;
+        //
+        //     const csrfToken = $("meta[name='_csrf']").attr("content");
+        //     const csrfHeader = $("meta[name='_csrf_header']").attr("content");
+        //
+        //     $.ajax({
+        //         url: "/api/members/info",
+        //         type: "GET",
+        //         headers: {
+        //             [csrfHeader]: csrfToken, // CSRF 토큰 포함
+        //         },
+        //         success: function (memberId) {
+        //             $("#memberId").text(memberId);
+        //         },
+        //         error: function () {
+        //             console.warn("사용자 정보를 가져오는 데 실패했습니다.");
+        //         }
+        //     });
+        // }
 
         /** CSRF 토큰 설정 */
         function setupAjax() {
@@ -402,12 +402,12 @@
             const couponCode = $("#couponCode").val().trim();
 
             //     //로그인했는지 확인
-                const isLoggedIn = $("meta[name='isLoggedIn']").attr("content") === "true";
-                if (!isLoggedIn) {
-                    alert("로그인 후 이용해주세요.");
-                    window.location.href = "/members/login"; // 로그인 페이지로 리다이렉트
-                    return; // 함수 종료
-                }
+            const isLoggedIn = $("meta[name='isLoggedIn']").attr("content") === "true";
+            if (!isLoggedIn) {
+                alert("로그인 후 이용해주세요.");
+                window.location.href = "/members/login"; // 로그인 페이지로 리다이렉트
+                return; // 함수 종료
+            }
 
             if (!couponCode) {
                 alert("쿠폰 코드를 입력해주세요.");

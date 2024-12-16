@@ -55,20 +55,15 @@ public class MileageController {
     }
 
     @PostMapping("/process-order")
-    public ResponseEntity<String> processOrder(@RequestBody OrderRequestDTO orderRequest,
-                                               @SessionAttribute(name = "couponApplied", required = false) Boolean couponApplied,
-                                               HttpSession session) {
+    public ResponseEntity<String> processOrder(@RequestBody OrderRequestDTO orderRequest, HttpSession session) {
         Member currentMember = memberService.getCurrentLoggedInMember();
-
 
         if (currentMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not logged in.");
         }
 
-        // 1. 쿠폰 적용 여부 확인
-        if (!Boolean.TRUE.equals(couponApplied)) {
-            return ResponseEntity.badRequest().body("쿠폰을 먼저 적용해주세요.");
-        }
+        // 쿠폰 검사 제거 - 항상 진행하도록 수정
+        System.out.println("Skipping coupon check, proceeding with order.");
 
         try {
             // DTO에서 값 추출
@@ -78,7 +73,7 @@ public class MileageController {
             // 서비스 호출
             mileageService.processOrder(currentMember.getId(), purchaseAmount, mileageUsed);
 
-            // 마일리지 적용 상태를 세션에 저장
+            // 마일리지 적용 상태를 세션에 저장 (옵션)
             session.setAttribute("mileageApplied", true);
 
             return ResponseEntity.ok("Order processed successfully.");
@@ -86,6 +81,5 @@ public class MileageController {
             return ResponseEntity.badRequest().body("Error processing order: " + e.getMessage());
         }
     }
-
 
 }

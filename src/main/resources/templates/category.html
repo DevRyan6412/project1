@@ -51,7 +51,7 @@ $(document).ready(function() {
 
 
 // 상품 목록을 Ajax로 불러오는 함수
-function loadItems(category, page = 0, size = 10) {
+function loadItems(category, page = 0, size = 12) {
 
     // CSRF 토큰 가져오기 ==========================
     var token = $("meta[name='_csrf']").attr("content");
@@ -93,7 +93,7 @@ function loadItems(category, page = 0, size = 10) {
                     // 각 상품에 대한 HTML 구성
 
                     itemsHtml += `
-                        <div class="col-6 col-md-4 col-lg-3 mb-5">
+                        <div class="col-6 col-md-4 col-lg-3 mb-5 justify-content-center">
                             <div class="card h-100">
                                 <a href="/item/${item.id}" class="text-dark">
                                     <img src="${item.imgUrl || '/images/default.png'}" class="card-img-top" alt="${item.itemNm}">
@@ -129,7 +129,7 @@ function loadItems(category, page = 0, size = 10) {
     });
 }
 
-// 페이지네이션을 위한 함수 (예시)
+// 페이지네이션을 위한 함수
 function createPagination(response) {
     const totalPages = response.totalPages;
     let paginationHtml = '';

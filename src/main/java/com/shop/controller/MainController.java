@@ -23,7 +23,7 @@ public class MainController {
 
     @GetMapping(value = "/")
     public String main(ItemSearchDto itemSearchDto, Optional<Integer> page, Model model) {
-        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 10);
+        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 12);
         Page<MainItemDto> items = itemService.getMainItemPage(itemSearchDto, pageable);
 
         // 각 아이템의 평균 별점을 계산하여 모델에 추가

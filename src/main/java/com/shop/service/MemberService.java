@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +64,7 @@ public class MemberService implements UserDetailsService {
                 .build();
     }
 
+
     // 현재 로그인한 회원의 정보를 반환하는 메서드
     public Member getCurrentLoggedInMember() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -75,6 +75,7 @@ public class MemberService implements UserDetailsService {
         String email = authentication.getName(); // 인증된 사용자의 이메일
         return memberRepository.findByEmail(email);
     }
+
 
     public MemberInfoDto getCurrentMemberInfo() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
