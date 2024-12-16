@@ -18,6 +18,7 @@ target/
 *.iws
 *.iml
 *.ipr
+application.properties
 
 ### NetBeans ###
 /nbproject/private/
@@ -324,5 +325,6 @@ gradle-app.setting
 ### Gradle Patch ###
 # Java heap dump
 *.hprof
+
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,intellij+all,visualstudiocode,maven,gradle,intellij

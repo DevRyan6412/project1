@@ -5,8 +5,10 @@ import com.shop.dto.ItemFormDto;
 import com.shop.dto.ItemSearchDto;
 import com.shop.entity.Comment;
 import com.shop.entity.Item;
+import com.shop.entity.Member;
 import com.shop.service.CommentService;
 import com.shop.service.ItemService;
+import com.shop.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,14 +34,15 @@ public class ItemController {
 
     private final ItemService itemService;
     private final CommentService commentService;
+    private final MemberService memberService;
 
-    @GetMapping(value = "/admin/item/new")
+    @GetMapping(value = "/seller/item/new")
     public String itemForm(Model model){
         model.addAttribute("itemFormDto", new ItemFormDto());
         return "item/itemForm"; //요기
     }
 
-    @PostMapping(value="/admin/item/new")
+    @PostMapping(value="/seller/item/new")
     public String itemNew(@Valid ItemFormDto itemFormDto, BindingResult bindingResult, Model model, @RequestParam("itemImgFile") List<MultipartFile> itemImgFileList) {
         if(bindingResult.hasErrors()) {
             return "item/itemForm";
@@ -59,7 +62,7 @@ public class ItemController {
         return "redirect:/";//상품이 등록완료 되면 메인페이지로 이동
     }
 
-    @GetMapping(value = "/admin/item/{itemId}")
+    @GetMapping(value = "/seller/item/{itemId}")
     public String itemDtl(@PathVariable("itemId") Long itemId, Model model) {
         try {
             ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
@@ -72,7 +75,7 @@ public class ItemController {
         return "item/itemForm";
     }
 
-    @PostMapping(value = "/admin/item/{itemId}")
+    @PostMapping(value = "/seller/item/{itemId}")
     public String itemUpdate(@Valid ItemFormDto itemFormDto, BindingResult bindingResult, @RequestParam("itemImgFile") List<MultipartFile> itemImgFileList, Model model){
         if(bindingResult.hasErrors()){
             return "item/itemForm";
@@ -91,7 +94,7 @@ public class ItemController {
         return "redirect:/";
     }
 
-    @GetMapping(value = {"/admin/items", "/admin/items/{page}"})
+    @GetMapping(value = {"/seller/items", "/seller/items/{page}"})
     public String itemManage(ItemSearchDto itemSearchDto, @PathVariable("page") Optional<Integer> page, Model model){
         Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 3);
 
@@ -102,14 +105,37 @@ public class ItemController {
         return "item/itemMng";
     }
 
+//    @GetMapping(value = "/item/{itemId}")
+//    public String itemDtl(Model model, @PathVariable("itemId") Long itemId, Principal principal){
+//        ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
+//        model.addAttribute("item", itemFormDto);
+//        // 해당 아이템에 대한 댓글 목록 조회
+//        List<Comment> comments = commentService.getCommentsByItem(itemId);
+//        model.addAttribute("comments", comments);
+//        model.addAttribute("commentDto", new CommentDto());
+//        return "item/itemDtl";
+//    }
+
     @GetMapping(value = "/item/{itemId}")
-    public String itemDtl(Model model, @PathVariable("itemId") Long itemId, Principal principal){
+    public String itemDtl(Model model, @PathVariable("itemId") Long itemId, Principal principal) {
         ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
         model.addAttribute("item", itemFormDto);
+
+        // 회원 정보 추가
+        Member member = new Member();
+        if (principal != null) {
+            String email = principal.getName();
+            member = memberService.findByEmail(email);
+        } else {
+            member.setName("게스트"); // 기본 이름 설정
+        }
+        model.addAttribute("member", member);
+
         // 해당 아이템에 대한 댓글 목록 조회
         List<Comment> comments = commentService.getCommentsByItem(itemId);
         model.addAttribute("comments", comments);
         model.addAttribute("commentDto", new CommentDto());
+
         return "item/itemDtl";
     }
 }

@@ -62,4 +62,18 @@ public class CommentService {
         return commentRepository.findById(rid)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
     }
+
+    public Double getAverageStar(Long itemId){
+        List<Comment> comments = commentRepository.findByItemId(itemId); //해당 아이템의 모든 댓글 조회
+        if (comments.isEmpty()) {
+            return 0.0; // 댓글이 없을 경우 평균 별점은 0.0
+        }
+
+        double totalStar = 0.0; // 총 별점 합계
+        for (Comment comment : comments) {
+            totalStar += comment.getCommentStar().toInt(); // CommentStar를 숫자로 변환하여 합산
+        }
+
+        return totalStar / comments.size(); // 평균 별점 계산
+    }
 }
