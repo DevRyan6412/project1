@@ -101,7 +101,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        // 부모 클래스의 메서드를 호출하여 기본적인 사용자 정보를 가져옵니다.
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
@@ -123,35 +122,39 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             name = (String) response.get("name");
         }
 
-        // 이메일이 null인지 확인
         if (email == null || email.isEmpty()) {
             throw new OAuth2AuthenticationException("OAuth2 공급자로부터 이메일 정보를 가져올 수 없습니다.");
         }
 
         try {
-            // 이메일로 회원 조회
             Member findMember = memberService.findByEmail(email);
             if (findMember == null) {
                 // 신규 회원 가입 처리
                 MemberFormDto memberFormDto = new MemberFormDto();
                 memberFormDto.setEmail(email);
                 memberFormDto.setName(name);
-                memberFormDto.setPassword(UUID.randomUUID().toString());
+
+                // 기본 주소 정보 설정
+                memberFormDto.setAddress("[00000] 소셜로그인 기본주소");
+
+                // 기본 비밀번호 설정
+                String defaultPassword = UUID.randomUUID().toString();
+                memberFormDto.setPassword(defaultPassword);
 
                 Member member = Member.createMember(memberFormDto, passwordEncoder);
                 member.setRole(Role.USER);
                 memberService.saveMember(member);
+
+                // 로그로 기본 비밀번호 출력 (개발 단계에서만 사용)
+                System.out.println("소셜 로그인 회원가입 완료 - Email: " + email + ", 기본 비밀번호: " + defaultPassword);
             }
         } catch (Exception e) {
             throw new OAuth2AuthenticationException("OAuth2 인증 과정에서 오류가 발생했습니다: " + e.getMessage());
         }
 
-        // 권한 설정
         Collection<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
-
-        // 사용자 정보를 포함한 DefaultOAuth2User 객체 생성 및 반환
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
-        attributes.put("email", email); // 이메일 정보 추가
+        attributes.put("email", email);
 
         return new DefaultOAuth2User(authorities, attributes, "email");
     }

@@ -58,12 +58,13 @@ public class MemberController {
         try {
             Member member = Member.createMember(memberFormDto, passwordEncoder);
             memberService.saveMember(member);
+            model.addAttribute("memberFormDto", new MemberFormDto());
+            model.addAttribute("message", "회원 가입을 축하합니다.");
+            return "member/memberForm";
         } catch (IllegalStateException e){
-            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("errorMessage", "에러가 발생하였습니다. 다시 시도해주세요.");
             return "member/memberForm";
         }
-
-        return "redirect:/";
     }
 
     @GetMapping("/check-email")
@@ -75,14 +76,16 @@ public class MemberController {
     }
 
     @GetMapping(value = "/login")
-    public String loginMember(){
-        return "member/memberLoginForm";
+    public String loginMember(Model model){
+        model.addAttribute("memberFormDto", new MemberFormDto());
+        return "member/memberForm";
     }
 
     @GetMapping(value = "/login/error")
     public String loginError(Model model){
+        model.addAttribute("memberFormDto", new MemberFormDto());
         model.addAttribute("loginErrorMsg", "아이디 또는 비밀번호를 확인해주세요");
-        return "member/memberLoginForm";
+        return "member/memberForm";
     }
 
     @GetMapping("/oauth2/success")
