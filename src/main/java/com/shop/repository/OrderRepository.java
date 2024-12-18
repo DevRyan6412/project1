@@ -20,4 +20,19 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "where o.member.email = :email"
     )
     Long countOrder(@Param("email") String email);
+
+    @Query("select distinct o from Order o " +
+            "join fetch o.orderItems oi " +
+            "join fetch oi.item i " +
+            "order by o.orderDate desc")
+    List<Order> findRecentOrders(Pageable pageable);
+
+    // ADMIN용 전체 주문 조회
+    @Query("select o from Order o " +
+            "order by o.orderDate desc"
+    )
+    List<Order> findAllOrders(Pageable pageable);
+
+    @Query("select count(o) from Order o")
+    Long countAllOrders();
 }

@@ -13,14 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
@@ -36,13 +35,13 @@ public class ItemController {
     private final CommentService commentService;
     private final MemberService memberService;
 
-    @GetMapping(value = "/seller/item/new")
+    @GetMapping(value = "/admin/item/new")
     public String itemForm(Model model){
         model.addAttribute("itemFormDto", new ItemFormDto());
         return "item/itemForm"; //요기
     }
 
-    @PostMapping(value="/seller/item/new")
+    @PostMapping(value="/admin/item/new")
     public String itemNew(@Valid ItemFormDto itemFormDto, BindingResult bindingResult, Model model, @RequestParam("itemImgFile") List<MultipartFile> itemImgFileList) {
         if(bindingResult.hasErrors()) {
             return "item/itemForm";
@@ -62,7 +61,7 @@ public class ItemController {
         return "redirect:/";//상품이 등록완료 되면 메인페이지로 이동
     }
 
-    @GetMapping(value = "/seller/item/{itemId}")
+    @GetMapping(value = "/admin/item/{itemId}")
     public String itemDtl(@PathVariable("itemId") Long itemId, Model model) {
         try {
             ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
@@ -75,7 +74,7 @@ public class ItemController {
         return "item/itemForm";
     }
 
-    @PostMapping(value = "/seller/item/{itemId}")
+    @PostMapping(value = "/admin/item/{itemId}")
     public String itemUpdate(@Valid ItemFormDto itemFormDto, BindingResult bindingResult, @RequestParam("itemImgFile") List<MultipartFile> itemImgFileList, Model model){
         if(bindingResult.hasErrors()){
             return "item/itemForm";
@@ -94,15 +93,31 @@ public class ItemController {
         return "redirect:/";
     }
 
-    @GetMapping(value = {"/seller/items", "/seller/items/{page}"})
+//    @PostMapping(value = "/seller/item/delete/{itemId}")
+    @PostMapping(value = "/admin/item/delete/{itemId}")//
+    @PreAuthorize("hasRole('ADMIN')")
+    public String deleteItem(@PathVariable("itemId") Long itemId, RedirectAttributes redirectAttributes) {
+        try {
+            itemService.deleteItem(itemId);
+            redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "상품 삭제 중 오류가 발생했습니다.");
+        }
+//        return "redirect:/seller/items";
+        return "redirect:/admin/items";//
+    }
+
+//    @GetMapping(value = {"/seller/items", "/seller/items/{page}"})
+    @GetMapping(value = {"/admin/items", "/admin/items/{page}"})//
     public String itemManage(ItemSearchDto itemSearchDto, @PathVariable("page") Optional<Integer> page, Model model){
-        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 3);
+        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 10); //3->10으로 변경
 
         Page<Item> items = itemService.getAdminItemPage(itemSearchDto, pageable);
         model.addAttribute("items", items);
         model.addAttribute("itemSearchDto", itemSearchDto);
         model.addAttribute("maxPage", 5);
-        return "item/itemMng";
+//        return "item/itemMng";
+        return "admin/items";//
     }
 
 //    @GetMapping(value = "/item/{itemId}")

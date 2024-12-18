@@ -2,6 +2,7 @@ package com.shop.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ public class OrderItem  extends BaseEntity{
     @Column(name="order_item_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)//필요없는 정보는 읽어오지 않게 설정->요청시 읽어옴
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)//필요없는 정보는 읽어오지 않게 설정->요청시 읽어옴
     @JoinColumn(name="item_id")
     private Item item;
 

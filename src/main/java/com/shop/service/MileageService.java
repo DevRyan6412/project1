@@ -109,20 +109,52 @@ public class MileageService {
     }
 
     // 마일리지 요약 조회
+//    @Transactional
+//    public MileageSummaryDTO getMileageSummary(Long memberId) {
+//        Member member = memberRepository.findById(memberId)
+//                .orElseThrow(() -> new RuntimeException("Member not found"));
+//
+//        MileageSummary summary = mileageSummaryRepository.findByMember(member)
+//                .orElseThrow(() -> new RuntimeException("Mileage summary not found"));
+//
+//        return new MileageSummaryDTO(
+//                summary.getTotalMileage(),
+//                summary.getTotalEarned(),
+//                summary.getTotalUsed(),
+//                summary.getLastUpdated()
+//        );
+//    }
+
     @Transactional
     public MileageSummaryDTO getMileageSummary(Long memberId) {
+        // 회원 정보 조회
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
+        // 마일리지 요약 조회 또는 기본값 생성
         MileageSummary summary = mileageSummaryRepository.findByMember(member)
-                .orElseThrow(() -> new RuntimeException("Mileage summary not found"));
+                .orElseGet(() -> createDefaultMileageSummary(member));
 
+        // DTO 반환
         return new MileageSummaryDTO(
                 summary.getTotalMileage(),
                 summary.getTotalEarned(),
                 summary.getTotalUsed(),
                 summary.getLastUpdated()
         );
+    }
+
+    // 기본 마일리지 요약 생성 메서드
+    private MileageSummary createDefaultMileageSummary(Member member) {
+        MileageSummary summary = new MileageSummary();
+        summary.setMember(member);
+        summary.setTotalMileage(0);
+        summary.setTotalEarned(0);
+        summary.setTotalUsed(0);
+        summary.setLastUpdated(LocalDateTime.now());
+
+        // 생성된 마일리지 요약 저장
+        return mileageSummaryRepository.save(summary);
     }
 
     // 마일리지 내역 조회

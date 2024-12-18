@@ -3,6 +3,7 @@ package com.shop.controller;
 import com.shop.dto.CommentDto;
 import com.shop.entity.Comment;
 import com.shop.entity.Item;
+import com.shop.repository.ItemRepository;
 import com.shop.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,7 +24,7 @@ import java.security.Principal;
 public class CommentController {
 
     private final CommentService commentService;
-
+    private final ItemRepository itemRepository;
     // 상품평 작성 처리
     @PostMapping("/comments")//
     public String createComment(@PathVariable Long itemId, @Valid @ModelAttribute CommentDto commentDto, BindingResult bindingResult) {
@@ -33,8 +34,8 @@ public class CommentController {
 
         System.out.println("Selected Star: " + commentDto.getCommentStar());
 
-        Item item = new Item();
-        item.setId(itemId);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. ID: " + itemId));
 
         commentService.createComment(commentDto.getContent().trim(), item, commentDto.getCreatedBy(), commentDto.getCommentStar());
         return "redirect:/item/" + itemId;   // 상품평 작성 후 해당 아이템의 댓글 목록으로 리디렉션

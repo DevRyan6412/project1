@@ -16,7 +16,6 @@ public class Member extends BaseEntity {
 
     @Id
 //    @Column(name="member_id")
-    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // IDENTITY 전략 사용
     private Long id;
 
@@ -32,14 +31,19 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "business_registration_number")
-    private String businessNumber;
 
     @Column(nullable = false, columnDefinition = "integer default 0")  // default 값 설정
-//    @Column(nullable = false)  // 민혁
     private int availableMileage = 0;
 
-    // createMember 메서드는 그대로 유지
+
+    @Column
+    private String zipCode;      // 우편번호
+
+
+
+    @Column
+    private String detailAddress; // 상세주소
+
     public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder){
         Member member = new Member();
         member.setName(memberFormDto.getName());
@@ -48,7 +52,6 @@ public class Member extends BaseEntity {
         String password = passwordEncoder.encode(memberFormDto.getPassword());
         member.setPassword(password);
         member.setRole(memberFormDto.getRole());
-        member.setBusinessNumber(memberFormDto.getBusinessNumber());
         member.setAvailableMileage(0);
         return member;
     }

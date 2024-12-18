@@ -35,10 +35,10 @@
 </th:block>
 
 <th:block layout:fragment="script">
-<!-- JS, Popper.js, and jQuery-->
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<!-- Bootstrap core JS-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JS, Popper.js, and jQuery-->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script th:inline="javascript">
         // 카테고리별 아이템 로딩 함수
         const category = new URLSearchParams(window.location.search).get('category');
@@ -51,7 +51,7 @@ $(document).ready(function() {
 
 
 // 상품 목록을 Ajax로 불러오는 함수
-function loadItems(category, page = 0, size = 10) {
+function loadItems(category, page = 0, size = 12) {
 
     // CSRF 토큰 가져오기 ==========================
     var token = $("meta[name='_csrf']").attr("content");
@@ -93,7 +93,7 @@ function loadItems(category, page = 0, size = 10) {
                     // 각 상품에 대한 HTML 구성
 
                     itemsHtml += `
-                        <div class="col-6 col-md-4 col-lg-3 mb-5">
+                        <div class="col-6 col-md-4 col-lg-3 mb-5 justify-content-center">
                             <div class="card h-100">
                                 <a href="/item/${item.id}" class="text-dark">
                                     <img src="${item.imgUrl || '/images/default.png'}" class="card-img-top" alt="${item.itemNm}">
@@ -129,7 +129,7 @@ function loadItems(category, page = 0, size = 10) {
     });
 }
 
-// 페이지네이션을 위한 함수 (예시)
+// 페이지네이션을 위한 함수
 function createPagination(response) {
     const totalPages = response.totalPages;
     let paginationHtml = '';
@@ -202,7 +202,7 @@ function createPagination(response) {
                         }
                     });
             }
-</script>
+    </script>
 </th:block>
 
 <body>
@@ -218,18 +218,18 @@ function createPagination(response) {
     <!-- Section-->
     <section class="py-5">
         <div class="container px-4 px-lg-5 mt-5">
-                <!-- 아이템 리스트 출력 영역 -->
-                <div id="item-list" class="row gx-4 gx-lg-5">
-                    <!-- Ajax로 불러온 아이템들이 동적으로 출력되는 영역 -->
-                </div>
+            <!-- 아이템 리스트 출력 영역 -->
+            <div id="item-list" class="row gx-4 gx-lg-5">
+                <!-- Ajax로 불러온 아이템들이 동적으로 출력되는 영역 -->
+            </div>
 
-                <br>
-                <!-- 추가되는 페이지네이션 영역 -->
-                <div>
-                    <ul id="pagination" class="pagination justify-content-center">
-                        <!-- 페이지네이션 링크들이 여기에 삽입됩니다 -->
-                    </ul>
-                </div>
+            <br>
+            <!-- 추가되는 페이지네이션 영역 -->
+            <div>
+                <ul id="pagination" class="pagination justify-content-center">
+                    <!-- 페이지네이션 링크들이 여기에 삽입됩니다 -->
+                </ul>
+            </div>
         </div>
     </section>
 </div>
