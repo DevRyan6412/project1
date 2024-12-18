@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+
+<th:block layout:fragment="script">
+  <script th:inline="javascript">
+    function cancelOrder(orderId) {
+      var token = $("meta[name='_csrf']").attr("content");
+      var header = $("meta[name='_csrf_header']").attr("content");
+
+      var url = "/order/" + orderId + "/cancel";
+      var paramData = { orderId: orderId };
+      var param = JSON.stringify(paramData);
+
+      $.ajax({
+        url: url,
+        type: "POST",
+        contentType: "application/json",
+        data: param,
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader(header, token);
+        },
+        // dataType: "json", // 서버가 JSON 대신 문자열을 반환한다면 주석 처리하거나 삭제
+        cache: false,
+        success: function (result, status) {
+          // 성공적으로 응답을 받았다면 콘솔에서 로그 확인
+          // console.log("AJAX 요청 성공, 응답: ", result);
+          alert(result);
+
+          // 버튼 선택 시 디버깅 로그 추가
+          var button = $('button.btn-danger.btn-sm[value="' + orderId + '"]');
+          // console.log("찾은 버튼 개수:", button.length);
+
+          if (button.length > 0) {
+            button.replaceWith('<span class="badge bg-secondary">취소 완료</span>');
+          } else {
+              /*취소오류*/
+            console.log("취소버튼오류")
+          }
+        },
+        error: function (jqXHR, status, error) {
+          if (jqXHR.status == '401') {
+            alert('로그인 후 이용해주세요');
+            location.href = '/members/login';
+          } else {
+            alert(jqXHR.responseText);
+          }
+        }
+      });
+    }
+  </script>
+</th:block>
+
+<th:block layout:fragment="css">
+  <style>
+    .content-mg {
+      margin: 2% auto 100px;
+      max-width: 800px;
+    }
+    .repImg {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+    }
+    .card {
+      width: 100%;
+      height: auto;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .order-header h5 {
+      margin: 0;
+    }
+    .order-header .badge {
+      font-size: 14px;
+    }
+    .order-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .order-item img {
+      margin-right: 15px;
+    }
+  </style>
+</th:block>
+
+<div layout:fragment="content" class="content-mg">
+  <h2 class="mb-4">전체 주문 이력</h2>
+
+  <div th:each="order : ${orders.getContent()}">
+    <div class="card">
+      <div class="order-header">
+        <div>
+          <h5 th:text="'주문 날짜: ' + ${order.orderDate}"></h5>
+          <h6 class="text-muted" th:text="'주문자 이메일: ' + ${order.memberEmail}"></h6>
+        </div>
+        <div>
+          <th:block th:if="${order.orderStatus == T(com.shop.constant.OrderStatus).ORDER}">
+            <button type="button" class="btn btn-danger btn-sm"
+                    th:value="${order.orderId}" onclick="cancelOrder(this.value)">주문 취소</button>
+          </th:block>
+          <th:block th:unless="${order.orderStatus == T(com.shop.constant.OrderStatus).ORDER}">
+            <span class="badge bg-secondary">취소 완료</span>
+          </th:block>
+        </div>
+      </div>
+      <hr>
+      <div th:each="orderItem : ${order.orderItemDtoList}" class="order-item">
+        <img th:src="${orderItem.imgUrl}" class="img-thumbnail repImg" th:alt="${orderItem.itemNm}">
+        <div>
+          <h6 class="mb-0" th:text="${orderItem.itemNm}"></h6>
+          <small class="text-muted">
+            <span th:text="'가격: ' + ${orderItem.orderPrice} + '원'"></span> /
+            <span th:text="'수량: ' + ${orderItem.count} + '개'"></span>
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div th:with="start=${(orders.number/maxPage)*maxPage + 1}, end=(${(orders.totalPages == 0) ? 1 : (start + (maxPage - 1) < orders.totalPages ? start + (maxPage - 1) : orders.totalPages)})">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" th:classappend="${orders.number eq 0} ? 'disabled' : ''">
+        <a th:href="@{'/admin/orders?page=' + ${orders.number-1}}" aria-label="Previous" class="page-link">
+          <span aria-hidden="true">Previous</span>
+        </a>
+      </li>
+      <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${orders.number eq page-1} ? 'active' : ''">
+        <a th:href="@{'/admin/orders?page=' + ${page-1}}" th:inline="text" class="page-link">[[${page}]]</a>
+      </li>
+      <li class="page-item" th:classappend="${orders.number+1 ge orders.totalPages} ? 'disabled' : ''">
+        <a th:href="@{'/admin/orders?page=' + ${orders.number+1}}" aria-label="Next" class="page-link">
+          <span aria-hidden="true">Next</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</html>

@@ -91,10 +91,15 @@
     <script th:inline="javascript">
         $(document).ready(function () {
 
-            // 초기화
-            calculateFinalPrice(); // 초기 결제 금액 계산
-            fetchAvailableMileage(); // 마일리지 잔액 가져오기
-            // fetchMemberId(); // 로그인된 사용자 정보 가져오기
+            fetchAvailableMileage();
+            calculateFinalPrice();
+
+            // 페이지 로드 시 마일리지, 쿠폰 초기화
+            resetMileage(false);
+            resetCoupon(false);
+            sessionStorage.removeItem("mileageApplied");
+            sessionStorage.removeItem("couponApplied");
+            calculateFinalPrice();
 
             // 수량 변경 시 금액 재계산 및 쿠폰/마일리지 재적용
             $("#count").change(function () {
@@ -370,7 +375,6 @@
 
             // 알림 표시
             if (showMessage) {
-                alert("마일리지가 초기화되었습니다. 다시 입력해주세요.");
             }
         }
 
@@ -391,12 +395,8 @@
 
             // 알림 표시
             if (showAlert) {
-                alert("쿠폰이 초기화되었습니다. 다시 입력해주세요.");
             }
         }
-
-
-
         /** 쿠폰 적용 */
         function applyCoupon() {
             const couponCode = $("#couponCode").val().trim();

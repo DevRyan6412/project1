@@ -104,26 +104,38 @@ public class CartController {
     }
 
     // 장바구니에서 주문 진행
+//    @PostMapping(value = "/cart/orders")
+//    public @ResponseBody ResponseEntity<?> orderCartItem(@RequestBody CartOrderDto cartOrderDto, Principal principal) {
+//        List<CartOrderDto> cartOrderDtoList = cartOrderDto.getCartOrderDtoList();
+//
+//        if (cartOrderDtoList == null || cartOrderDtoList.size() == 0) {
+//            return new ResponseEntity<>("주문할 상품을 선택 해주세요", HttpStatus.FORBIDDEN);
+//        }
+//        for (CartOrderDto cartOrder : cartOrderDtoList) {
+//            if (!cartService.validateCartItem(cartOrder.getCartItemId(), principal.getName())) {
+//                return new ResponseEntity<>("주문 권한이 없습니다.", HttpStatus.FORBIDDEN);
+//            }
+//        }
+//
+//        try {
+//            Long orderId = cartService.orderCartItem(cartOrderDtoList, principal.getName());
+//            return new ResponseEntity<>(orderId, HttpStatus.OK);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//        }
+//    }
     @PostMapping(value = "/cart/orders")
-    public @ResponseBody ResponseEntity<?> orderCartItem(@RequestBody CartOrderDto cartOrderDto, Principal principal) {
-        List<CartOrderDto> cartOrderDtoList = cartOrderDto.getCartOrderDtoList();
-
-        if (cartOrderDtoList == null || cartOrderDtoList.size() == 0) {
-            return new ResponseEntity<>("주문할 상품을 선택 해주세요", HttpStatus.FORBIDDEN);
-        }
-        for (CartOrderDto cartOrder : cartOrderDtoList) {
-            if (!cartService.validateCartItem(cartOrder.getCartItemId(), principal.getName())) {
-                return new ResponseEntity<>("주문 권한이 없습니다.", HttpStatus.FORBIDDEN);
-            }
-        }
-
+    public @ResponseBody ResponseEntity<?> orderCartItem(Principal principal) {
         try {
-            Long orderId = cartService.orderCartItem(cartOrderDtoList, principal.getName());
+            // 장바구니 전체 아이템을 주문 처리하도록 null을 전달
+            Long orderId = cartService.orderCartItem(null, principal.getName());
             return new ResponseEntity<>(orderId, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+
 
     // 마일리지 적용 후 장바구니 금액 계산
     @PutMapping(value = "/cart/apply-mileage")

@@ -35,13 +35,4 @@ public class MemberFormDto {
 
     private Role role = Role.USER; // 기본값 USER
 
-    private String businessNumber; // 사업자등록번호
-
-    @AssertTrue(message = "판매자는 사업자등록번호를 입력해야 합니다")
-    public boolean isValidBusinessNumber() {
-        if (role == Role.MANAGER) {
-            return businessNumber != null && !businessNumber.trim().isEmpty();
-        }
-        return true; // USER인 경우는 항상 true 반환
-    }
 }

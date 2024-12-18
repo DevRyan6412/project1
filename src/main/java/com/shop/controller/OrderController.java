@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
@@ -63,13 +64,50 @@ public class OrderController {
         return "order/orderHist";
     }
 
+//    @PostMapping("/order/{orderId}/cancel")
+//    public @ResponseBody ResponseEntity cancelOrder(@PathVariable("orderId") Long orderId, Principal principal){
+//
+//        if(!orderService.validateOrder(orderId, principal.getName())){
+//            return new ResponseEntity<String>("주문 취소 권한이 없습니다.", HttpStatus.FORBIDDEN);
+//        }
+//
+//        orderService.cancelOrder(orderId);
+//        return new ResponseEntity<Long>(orderId, HttpStatus.OK);
+//    }
+
     @PostMapping("/order/{orderId}/cancel")
-    public @ResponseBody ResponseEntity cancelOrder(@PathVariable("orderId") Long orderId, Principal principal){
-        if(!orderService.validateOrder(orderId, principal.getName())){
-            return new ResponseEntity<String>("주문 취소 권한이 없습니다.", HttpStatus.FORBIDDEN);
+    public @ResponseBody ResponseEntity<String> cancelOrder(@PathVariable("orderId") Long orderId, Principal principal, Authentication authentication) {
+        // 관리자인지 확인
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            // 관리자는 모든 주문 취소 가능
+            orderService.cancelOrder(orderId);
+            return new ResponseEntity<>("주문이 취소되었습니다.", HttpStatus.OK);
+        }
+
+        // 일반 사용자: 자신의 주문만 취소 가능
+        if (!orderService.validateOrder(orderId, principal.getName())) {
+            return new ResponseEntity<>("주문 취소 권한이 없습니다.", HttpStatus.FORBIDDEN);
         }
 
         orderService.cancelOrder(orderId);
-        return new ResponseEntity<Long>(orderId, HttpStatus.OK);
+        return new ResponseEntity<>("주문이 취소되었습니다.", HttpStatus.OK);
     }
+
+
+    @GetMapping(value = "/admin/orders")
+    public String adminOrderHist(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
+        Pageable pageable = PageRequest.of(page, 10); // 한 페이지에 10개씩 표시
+        Page<OrderHistDto> allOrders = orderService.getAllOrders(pageable);
+
+        model.addAttribute("orders", allOrders);
+        model.addAttribute("page", page);
+        model.addAttribute("maxPage", allOrders.getTotalPages());
+        return "admin/adminOrderHist";
+    }
+
+
+
 }

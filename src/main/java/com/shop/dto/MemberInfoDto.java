@@ -14,6 +14,5 @@ public class MemberInfoDto {
     private String address;
     private String zipcode;
     private Role role;
-    private String businessNumber;
     private Integer availableMileage;
 }
