@@ -46,15 +46,6 @@ public class MemberController {
             return "member/memberForm";
         }
 
-        // MANAGER인 경우 사업자등록번호 필수 체크
-        if (memberFormDto.getRole() == Role.MANAGER &&
-                (memberFormDto.getBusinessNumber() == null ||
-                        memberFormDto.getBusinessNumber().trim().isEmpty())) {
-            bindingResult.rejectValue("businessNumber", "required",
-                    "사업자등록번호는 필수 입력값입니다.");
-            return "member/memberForm";
-        }
-
         try {
             Member member = Member.createMember(memberFormDto, passwordEncoder);
             memberService.saveMember(member);

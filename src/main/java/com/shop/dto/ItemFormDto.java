@@ -17,15 +17,15 @@ public class ItemFormDto {
 
     private Long id;
 
-    @NotBlank(message = "상품명은 필수 입력 값입니다.")
+    @NotBlank(message = "상품명을 입력해주세요.")
     private String itemNm;
-    @NotNull(message = "가격은 필수 입력 값입니다.")
+    @NotNull(message = "가격을 입력해주세요.")
     private Integer price;
 
-    @NotBlank(message = "이름은 필수 입력 값입니다.")
+    @NotBlank(message = "상세설명을 입력해주세요.")
     private String itemDetail;
 
-    @NotNull(message = "재고는 필수 입력 값입니다.")
+    @NotNull(message = "판매수량을 입력해주세요.")
     private Integer stockNumber;
 
     private ItemSellStatus itemSellStatus;

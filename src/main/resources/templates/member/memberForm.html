@@ -86,10 +86,6 @@
       background: #e2e6ea;
     }
 
-    .business-fields {
-      display: none;
-    }
-
     .social-login {
       margin-top: 20px;
     }
@@ -291,22 +287,10 @@
       <div class="form-wrapper">
         <h5>👋 Hello</h5>
         <form th:action="@{/members/new}" method="post" th:object="${memberFormDto}">
-          <select th:field="*{role}" class="form-field" id="role">
-            <option value="USER">일반 개인 회원</option>
-            <option value="MANAGER">판매자</option>
-          </select>
 
           <input type="text" th:field="*{name}" class="form-field" id="name" placeholder="이름을 입력해주세요" required>
           <div th:if="${#fields.hasErrors('name')}" class="alert-danger">
             <p th:errors="*{name}"></p>
-          </div>
-
-          <div class="business-fields">
-            <input type="text" th:field="*{businessNumber}" class="form-field"
-                   placeholder="사업자등록번호를 입력해주세요">
-            <div th:if="${#fields.hasErrors('businessNumber')}" class="alert-danger">
-              <p th:errors="*{businessNumber}"></p>
-            </div>
           </div>
 
           <input type="email" th:field="*{email}" class="form-field" id="email" placeholder="이메일을 입력해주세요" required>
@@ -394,23 +378,6 @@
           } else {
             $("#passwordMatch").html('<div class="alert-danger"><p>비밀번호가 일치하지 않습니다</p></div>');
           }
-        }
-      });
-
-      // 회원 유형에 따른 필드 표시
-      $("#role").on("change", function() {
-        var role = $(this).val();
-        if(role === 'MANAGER') {
-          $(".business-fields").show();
-          $("#nameLabel").text("법인명 및 대표자명");
-          $("#name").attr("placeholder", "법인명 및 대표자명을 입력해주세요");
-          $("input[name='businessNumber']").prop('required', true);
-        } else {
-          $(".business-fields").hide();
-          $("#nameLabel").text("이름");
-          $("#name").attr("placeholder", "이름을 입력해주세요");
-          $("input[name='businessNumber']").prop('required', false);
-          $("input[name='businessNumber']").val('');
         }
       });
 

@@ -9,6 +9,8 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="item")
@@ -41,6 +43,9 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private String category; //카테고리
 
+//    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private List<Comment> comments = new ArrayList<>();
+
     public void updateItem(ItemFormDto itemFormDto) {
         this.itemNm = itemFormDto.getItemNm();
         this.price = itemFormDto.getPrice();
@@ -62,6 +67,28 @@ public class Item extends BaseEntity {
         this.stockNumber += stockNumber;
     }
 
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemImg> itemImgs;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<CartItem> cartItems;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<OrderItem> orderItems;
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", itemNm='" + itemNm + '\'' +
+                ", price=" + price +
+                // item의 다른 정보만 출력
+                '}';
+    }
 //    private LocalDateTime regTime; //등록 시간
 //    private LocalDateTime updateTime; //수정 시간
 }

@@ -11,6 +11,7 @@ import com.shop.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -97,5 +98,48 @@ public class OrderService {
         orderRepository.save(order);
 
         return order.getId();
+    }
+
+    public List<OrderHistDto> getRecentOrders() {
+        List<Order> orders = orderRepository.findRecentOrders(PageRequest.of(0, 3));
+        List<OrderHistDto> orderHistDtos = new ArrayList<>();
+
+        for (Order order : orders) {
+            OrderHistDto orderHistDto = new OrderHistDto(order);
+
+            List<OrderItem> orderItems = order.getOrderItems();
+            for(OrderItem orderItem : orderItems){
+                ItemImg itemImg = itemImgRepository.findByItemIdAndRepimgYn(orderItem.getItem().getId(), "Y");
+                String imgUrl = itemImg != null ? itemImg.getImgUrl() : "";
+
+                OrderItemDto orderItemDto = new OrderItemDto(orderItem, imgUrl);
+                orderHistDto.addOrderItemDto(orderItemDto);
+            }
+
+            orderHistDtos.add(orderHistDto);
+        }
+
+        return orderHistDtos;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrderHistDto> getAllOrders(Pageable pageable) {
+        List<Order> orders = orderRepository.findAllOrders(pageable); // 모든 주문 조회
+        Long totalCount = orderRepository.countAllOrders();           // 전체 주문 개수
+
+        List<OrderHistDto> orderHistDtos = new ArrayList<>();
+        for (Order order : orders) {
+            OrderHistDto orderHistDto = new OrderHistDto(order);
+
+            List<OrderItem> orderItems = order.getOrderItems();
+            for (OrderItem orderItem : orderItems) {
+                ItemImg itemImg = itemImgRepository.findByItemIdAndRepimgYn(orderItem.getItem().getId(), "Y");
+                OrderItemDto orderItemDto = new OrderItemDto(orderItem, itemImg.getImgUrl());
+                orderHistDto.addOrderItemDto(orderItemDto);
+            }
+            orderHistDtos.add(orderHistDto);
+        }
+
+        return new PageImpl<>(orderHistDtos, pageable, totalCount);
     }
 }

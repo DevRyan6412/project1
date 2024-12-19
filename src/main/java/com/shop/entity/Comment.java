@@ -5,6 +5,7 @@ import com.shop.dto.CommentDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Cascade;
 import org.springframework.data.annotation.CreatedBy;
 
 import javax.persistence.*;
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
 @Table(name="comment")
 @Getter
 @Setter
-@ToString
 public class Comment extends BaseEntity{
 
     @Id
@@ -22,7 +22,7 @@ public class Comment extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long rid; //댓글 번호
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id")
     private Item item;
 
@@ -46,5 +46,14 @@ public class Comment extends BaseEntity{
     public void updateComment(CommentDto commentDto){
         this.commentStar = commentDto.getCommentStar();
         this.content = commentDto.getContent();
+    }
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + rid +
+                ", content='" + content + '\'' +
+                ", commentStar=" + commentStar +
+                // item은 직접적으로 포함하지 않음으로써 순환 참조 방지
+                '}';
     }
 }

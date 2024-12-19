@@ -31,11 +31,18 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "business_registration_number")
-    private String businessNumber;
 
     @Column(nullable = false, columnDefinition = "integer default 0")  // default 값 설정
     private int availableMileage = 0;
+
+
+    @Column
+    private String zipCode;      // 우편번호
+
+
+
+    @Column
+    private String detailAddress; // 상세주소
 
     public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder){
         Member member = new Member();
@@ -45,12 +52,6 @@ public class Member extends BaseEntity {
         String password = passwordEncoder.encode(memberFormDto.getPassword());
         member.setPassword(password);
         member.setRole(memberFormDto.getRole());
-
-        // isValidBusinessNumber() 메서드를 사용하여 검증
-        if (memberFormDto.isValidBusinessNumber() && memberFormDto.getRole() == Role.MANAGER) {
-            member.setBusinessNumber(memberFormDto.getBusinessNumber());
-        }
-
         member.setAvailableMileage(0);
         return member;
     }

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -97,15 +98,19 @@ public class CartService {
         sendCartCountUpdate(email);
     }
 
-    // 장바구니에서 주문 진행
+
+    @Transactional
     public Long orderCartItem(List<CartOrderDto> cartOrderDtoList, String email) {
-        List<OrderDto> orderDtoList = new ArrayList<>();
+        Member member = memberRepository.findByEmail(email);
+        Cart cart = cartRepository.findByMemberId(member.getId());
+
+        if (cart == null || cart.getCartItems().isEmpty()) {
+            throw new IllegalStateException("장바구니가 비어있습니다.");
+        }
 
         // 주문 DTO 생성
-        for (CartOrderDto cartOrderDto : cartOrderDtoList) {
-            CartItem cartItem = cartItemRepository.findById(cartOrderDto.getCartItemId())
-                    .orElseThrow(() -> new EntityNotFoundException("CartItem not found"));
-
+        List<OrderDto> orderDtoList = new ArrayList<>();
+        for (CartItem cartItem : cart.getCartItems()) {
             OrderDto orderDto = new OrderDto();
             orderDto.setItemId(cartItem.getItem().getId());
             orderDto.setCount(cartItem.getCount());
@@ -115,14 +120,12 @@ public class CartService {
         // 주문 처리
         Long orderId = orderService.orders(orderDtoList, email);
 
-        // 장바구니에서 아이템 삭제
-        for (CartOrderDto cartOrderDto : cartOrderDtoList) {
-            CartItem cartItem = cartItemRepository.findById(cartOrderDto.getCartItemId())
-                    .orElseThrow(() -> new EntityNotFoundException("CartItem not found"));
-            cartItemRepository.delete(cartItem);
-        }
+        // 장바구니 아이템 삭제
+        cartItemRepository.deleteAll(cart.getCartItems()); // DB에서 삭제
+        cart.getCartItems().clear(); // 영속성 컨텍스트에서 cartItems 비우기
+        cartRepository.save(cart);   // 상태 저장
 
-        // 상품 갯수 업데이트 전송
+        // SSE로 업데이트 알림
         sendCartCountUpdate(email);
 
         return orderId;

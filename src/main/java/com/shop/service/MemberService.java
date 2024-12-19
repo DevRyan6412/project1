@@ -64,7 +64,6 @@ public class MemberService implements UserDetailsService {
                 .build();
     }
 
-
     // 현재 로그인한 회원의 정보를 반환하는 메서드
     public Member getCurrentLoggedInMember() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -75,7 +74,6 @@ public class MemberService implements UserDetailsService {
         String email = authentication.getName(); // 인증된 사용자의 이메일
         return memberRepository.findByEmail(email);
     }
-
 
     public MemberInfoDto getCurrentMemberInfo() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -101,15 +99,11 @@ public class MemberService implements UserDetailsService {
                     .zipcode(zipcode)
                     .address(address)
                     .role(member.getRole())
-                    .businessNumber(member.getBusinessNumber())
                     .availableMileage(member.getAvailableMileage())
                     .build();
         }
         return null;
     }
-
-
-
 
     @Transactional
     public void updateEmail(String newEmail) {
@@ -160,8 +154,4 @@ public class MemberService implements UserDetailsService {
             memberRepository.updateMemberAddress(email, formattedAddress);
         }
     }
-
-
-
-
 }
