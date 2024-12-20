@@ -22,7 +22,7 @@ public class Comment extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long rid; //댓글 번호
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
