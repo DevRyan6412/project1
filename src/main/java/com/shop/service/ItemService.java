@@ -97,10 +97,7 @@ public class ItemService {
     public void deleteItem(Long itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. ID: " + itemId));
-        System.out.println("삭제된 상품 : " + item);
-        System.out.println("삭제된 상품 : " + itemId);
-        System.out.println("삭제된 상품 : " + item.getId());
-//        itemRepository.deleteById(item.getId());
+//      itemRepository.deleteById(item.getId());
         itemRepository.delete(item);
     }
 

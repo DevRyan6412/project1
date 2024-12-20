@@ -218,10 +218,10 @@
                 <thead>
                 <tr>
                     <th>상품번호</th>
-<!--                    <th>카테고리</th>-->
+                    <th>카테고리</th>
                     <th>상품명</th>
                     <th>상태</th>
-<!--                    <th>평점</th>-->
+                    <th>평점</th>
                     <th>등록자</th>
                     <th>등록일</th>
                 </tr>
@@ -229,46 +229,25 @@
                 <tbody>
                 <tr th:each="item : ${items.getContent()}">
                     <td th:text="${item.id}"></td>
-<!--                    <td th:text="${item.category}"></td>-->
+                    <td th:text="${item.category}"></td>
                     <td>
                         <a th:href="'/admin/item/'+${item.id}" th:text="${item.itemNm}"></a>
                     </td>
                     <td th:text="${item.itemSellStatus == T(com.shop.constant.ItemSellStatus).SELL} ? '판매중' : '품절'"></td>
-<!--                    <td>&lt;!&ndash;평균별점&ndash;&gt;-->
-<!--                        <div class="d-flex justify-content-center small text-warning mb-2">-->
-<!--                            <span th:each="i : ${#numbers.sequence(1, 5)}">-->
-<!--                                <div th:if="${i <= item.averageStar}" class="bi-star-fill"></div>-->
-<!--                                <div th:if="${i > item.averageStar}" class="bi-star"></div>-->
-<!--                            </span>-->
-<!--                        </div>-->
-<!--                    </td>-->
-                    <td th:text="${item.createdBy}"></td>
+                    <td><!--평균별점-->
+                        <div class="d-flex justify-content-center small text-warning mb-2">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                <div th:if="${i <= item.averageStar}" class="bi-star-fill"></div>
+                                <div th:if="${i > item.averageStar}" class="bi-star"></div>
+                            </span>
+                        </div>
+                    </td>
+                    <td th:text="${#strings.substringBefore(item.createdBy, '@')}"></td>
                     <td th:text="${#temporals.format(item.regTime, 'yyyy-MM-dd')}"></td>
                 </tr>
                 </tbody>
             </table>
-            <!-- 페이징 -->
-<!--            <div th:with="start=${(items.number/maxPage)*maxPage + 1}, end=(${(items.totalPages == 0) ? 1 : (start + (maxPage - 1) < items.totalPages ? start + (maxPage - 1) : items.totalPages)})" >-->
-<!--                <ul class="pagination justify-content-center">-->
-
-<!--                    <li class="page-item" th:classappend="${items.number eq 0}?'disabled':''">-->
-<!--                        <a th:href="@{/admin/items/{page}(page=${items.number - 1}) + '?searchQuery=' + ${itemSearchDto.searchQuery} + '&page=' + ${items.number-1}}" aria-label='Previous' class="page-link" id="pagePN">-->
-<!--                            <span aria-hidden='true'>Previous</span>-->
-<!--                        </a>-->
-<!--                    </li>-->
-
-<!--                    <li class="page-item" id="pageNum" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${items.number eq page-1}?'active':''">-->
-<!--                        <a th:href="@{'/' +'?searchQuery=' + ${itemSearchDto.searchQuery} + '&page=' + ${page-1}}" th:inline="text" class="page-link" >[[${page}]]</a>-->
-<!--                    </li>-->
-<!--                    <li class="page-item" th:classappend="${items.number+1 ge items.totalPages}?'disabled':''">-->
-<!--                        <a th:href="@{'/' +'?searchQuery=' + ${itemSearchDto.searchQuery} + '&page=' + ${items.number+1}}" aria-label='Next' class="page-link" id="pagePN">-->
-<!--                            <span aria-hidden='true'>Next</span>-->
-<!--                        </a>-->
-<!--                    </li>-->
-
-<!--                </ul>-->
-<!--            </div>-->
-
+            <!--페이징-->
             <div th:with="start=${(items.number / maxPage) * maxPage + 1},
             end=(${(items.totalPages == 0) ? 1 : (start + (maxPage - 1) < items.totalPages ? start + (maxPage - 1) : items.totalPages)})">
                 <ul class="pagination justify-content-center">

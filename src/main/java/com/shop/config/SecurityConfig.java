@@ -49,10 +49,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 // 권한 설정
                 .authorizeRequests()
-                .antMatchers("/", "/members/login", "/members/new", "/css/**", "/js/**", "/img/**", "/images/**", "/members/check-email", "/item/**", "/category/**", "/api/mileage/summary", "/api/members/info").permitAll()
+                .antMatchers("/", "/members/login", "/members/new", "/css/**", "/js/**", "/img/**", "/images/**", "/members/check-email", "/item/**", "/category/**", "/api/mileage/summary", "/api/members/info", "/customer-service/**", "/api/qna/**", "/api/faqs/**","/api/reservations/**", "/api/chatbot/**").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/admin/**", "/admin/**","/coupon/**").hasRole("ADMIN")
-                .antMatchers("/mypage/**","/api/members/info","/orders/**").authenticated()
+                .antMatchers("/mypage/**","/api/members/info","/orders/**", "/customer-service/**", "/api/qna/**", "/api/faqs/**","/api/reservations/**", "/api/chatbot/**").authenticated()
                 .anyRequest().authenticated()
                 .and()
 

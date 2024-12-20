@@ -42,6 +42,8 @@ public class Item extends BaseEntity {
 
     @Column(nullable = false)
     private String category; //카테고리
+    
+    private Double averageStar; //별점
 
 //    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE, orphanRemoval = true)
 //    private List<Comment> comments = new ArrayList<>();
