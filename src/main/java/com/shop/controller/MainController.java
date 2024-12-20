@@ -37,5 +37,8 @@ public class MainController {
         model.addAttribute("maxPage", 5);
         return "main";
     }
+    private Double calculateAverageStar(Long itemId) {
+        return commentService.getAverageStar(itemId);
+    }
 
 }

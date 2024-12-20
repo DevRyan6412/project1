@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>관리자 페이지</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Bootstrap icons-->
@@ -276,6 +278,7 @@
     $("label[for='fileInput_" + fileIndex + "']").text(fileName); // 라벨 텍스트 변경
   });
 }
+
     </script>
 </th:block>
 
@@ -381,7 +384,7 @@
                     <button th:formaction="@{'/admin/item/'+${itemFormDto.id}}" type="submit" class="btn text-white" style="background-color: #333333;">상품 수정</button>
                     <form th:action="@{'/admin/item/delete/' + ${itemFormDto.id}}" method="post" style="display: inline;">
                         <input type="hidden" name="_method" value="DELETE">
-                        <button type="submit" style="display: inline;" class="btn btn-danger" onclick="return confirm('정말로 삭제하시겠습니까?');">상품 삭제</button>
+                        <button th:formaction="@{'/admin/item/delete/' + ${itemFormDto.id}}" type="submit" style="display: inline;" class="btn btn-danger" onclick="return confirm('정말로 삭제하시겠습니까?');">상품 삭제</button>
                     </form>
                 </div>
 
